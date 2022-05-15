@@ -1,9 +1,9 @@
 const uuid = require('uuid')
 const path = require('path')
-const {Lot, LotInfo} = require('../models/models')
+const {Art, ArtInfo} = require('../models/models')
 const ApiError = require('../error/ApiError')
 
-class LotController {
+class ArtController {
 
     async create(req, res, next) {
         try {
@@ -11,20 +11,20 @@ class LotController {
             const {img} = req.files
             let fileName = uuid.v4() + ".jpg"
             img.mv(path.resolve(__dirname, '..', 'static', fileName))
-            const lot = await Lot.create({name, typeId, artistId, img: fileName})
+            const art = await Art.create({name, typeId, artistId, img: fileName})
     
             if(info){
                 info = JSON.parse(info)
                 info.forEach(i =>
-                    LotInfo.create({
+                    ArtInfo.create({
                         title: i.title,
                         descriptoin: i.descriptoin,
-                        lotId: lot.id
+                        artId: art.id
                     }))
             }
 
            
-            return res.json(lot)
+            return res.json(art)
         } catch (e) {
             next(ApiError.badRequest(e.message))
         }
@@ -40,31 +40,31 @@ class LotController {
         page = page || 1
         limit = limit || 9
         let offset = page * limit - limit
-        let lots;
+        let arts;
         if (!artistId && !typeId) {
-            lots = await Lot.findAndCountAll({limit, offset})
+            arts = await Art.findAndCountAll({limit, offset})
             }
         if (artistId && !typeId) {
-            lots = await Lot.findAndCountAll({where:{artistId}, limit, offset})
+            arts = await Art.findAndCountAll({where:{artistId}, limit, offset})
             }
         if (!artistId && typeId) {
-            lots = await Lot.findAndCountAll({where:{typeId}, limit, offset})            
+            arts = await Art.findAndCountAll({where:{typeId}, limit, offset})            
             }
         if (artistId && typeId) {
-            lots = await Lot.findAndCountAll({where:{artistId, typeId}, limit, offset})            
+            arts = await Art.findAndCountAll({where:{artistId, typeId}, limit, offset})            
         }
-        return res.json(lots)
+        return res.json(arts)
     }
 
     async getOne(req, res) {
         const {id} = req.params
-        const lot = await Lot.findOne(
+        const art = await Art.findOne(
             {
                 where: {id},
-                include: [{model: LotInfo, as: 'info'}]
+                include: [{model: ArtInfo, as: 'info'}]
             }
         )
-        return res.json(lot)
+        return res.json(art)
     }
     
     async delete(req, res) {
@@ -73,4 +73,4 @@ class LotController {
 
 }
 
-module.exports = new LotController()
+module.exports = new ArtController()

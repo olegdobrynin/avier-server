@@ -12,11 +12,11 @@ const Mark = sequelize.define('mark', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
 })
 
-const MarkLot = sequelize.define('mark_lot', {
+const MarkArt = sequelize.define('mark_art', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
 })
 
-const Lot = sequelize.define('lot', {
+const Art = sequelize.define('art', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
     name: {type: DataTypes.STRING},
     img: {type: DataTypes.STRING},
@@ -49,7 +49,7 @@ const Request = sequelize.define('request', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
    })
 
-const LotInfo = sequelize.define('lot_info', {
+const ArtInfo = sequelize.define('art_info', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
     title: {type: DataTypes.STRING, allowNull: false},
     description: {type: DataTypes.STRING, allowNull: false},
@@ -59,7 +59,7 @@ const TypeArtist = sequelize.define('type_artist', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
 })
 
-const LotArtist = sequelize.define('lot_artist', {
+const ArtArtist = sequelize.define('art_artist', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
 })
 
@@ -67,7 +67,7 @@ const UserArtist = sequelize.define('user_artist', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
 })
 
-const LotFolder = sequelize.define('lot_folder', {
+const ArtFolder = sequelize.define('art_folder', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
 })
 
@@ -81,17 +81,17 @@ Like.belongsTo(User)
 User.hasMany(Request)
 Request.belongsTo(User)
 
-Mark.hasMany(MarkLot)
-MarkLot.belongsTo(Mark)
+Mark.hasMany(MarkArt)
+MarkArt.belongsTo(Mark)
 
-Lot.hasMany(MarkLot)
-MarkLot.belongsTo(Lot)
+Art.hasMany(MarkArt)
+MarkArt.belongsTo(Art)
 
-Lot.hasMany(Like)
-Like.belongsTo(Lot)
+Art.hasMany(Like)
+Like.belongsTo(Art)
 
-Lot.hasMany(LotInfo, {as: 'info'})
-LotInfo.belongsTo(Lot)
+Art.hasMany(ArtInfo, {as: 'info'})
+ArtInfo.belongsTo(Art)
 
 Artist.hasMany(Request)
 Request.belongsTo(Artist)
@@ -99,27 +99,27 @@ Request.belongsTo(Artist)
 Artist.hasMany(Folder)
 Folder.belongsTo(Artist)
 
-Type.hasMany(Lot)
-Lot.belongsTo(Type)
+Type.hasMany(Art)
+Art.belongsTo(Type)
 
 Type.belongsToMany(Artist, {through: TypeArtist})
 Artist.belongsToMany(Type, {through: TypeArtist})
 
-Lot.belongsToMany(Artist, {through: LotArtist})
-Artist.belongsToMany(Lot, {through: LotArtist})
+Art.belongsToMany(Artist, {through: ArtArtist})
+Artist.belongsToMany(Art, {through: ArtArtist})
 
 User.belongsToMany(Artist, {through: UserArtist})
 Artist.belongsToMany(User, {through: UserArtist})
 
-Lot.belongsToMany(Folder, {through: LotFolder})
-Folder.belongsToMany(Lot, {through: LotFolder})
+Art.belongsToMany(Folder, {through: ArtFolder})
+Folder.belongsToMany(Art, {through: ArtFolder})
 
 module.exports = {
     User,
     Mark,
-    MarkLot,
-    Lot,
-    LotInfo,
+    MarkArt,
+    Art,
+    ArtInfo,
     Like,
     Request,
     Artist,
