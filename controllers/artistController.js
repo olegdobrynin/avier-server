@@ -25,7 +25,8 @@ class ArtistController {
     }
 
     async getAll(req, res) {
-
+        const artists = await Artist.findAll()
+        return res.json(artists)
     }
     
     async delete(req, res) {
