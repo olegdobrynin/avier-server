@@ -19,6 +19,9 @@ const MarkArt = sequelize.define('mark_art', {
 const Art = sequelize.define('art', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
     name: {type: DataTypes.STRING},
+    year: {type: DataTypes.INTEGER},
+    about: {type: DataTypes.TEXT},
+    city: {type: DataTypes.STRING},
     img: {type: DataTypes.STRING},
     like: {type: DataTypes.INTEGER},
 })
@@ -105,8 +108,8 @@ Art.belongsTo(Type)
 Type.belongsToMany(Artist, {through: TypeArtist})
 Artist.belongsToMany(Type, {through: TypeArtist})
 
-Art.belongsToMany(Artist, {through: ArtArtist})
 Artist.belongsToMany(Art, {through: ArtArtist})
+Art.belongsToMany(Artist, {as: 'artist', through: ArtArtist})
 
 User.belongsToMany(Artist, {through: UserArtist})
 Artist.belongsToMany(User, {through: UserArtist})
@@ -120,6 +123,7 @@ module.exports = {
     MarkArt,
     Art,
     ArtInfo,
+    ArtArtist,
     Like,
     Request,
     Artist,
