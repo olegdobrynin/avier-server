@@ -7,6 +7,7 @@ class ArtController {
 
     async create(req, res, next) {
         try {
+            console.log(req.body);
             let {name, about, city, year, typeId, artistId, info} = req.body
             const {img} = req.files
             let fileName = uuid.v4() + ".jpg"
@@ -15,22 +16,22 @@ class ArtController {
 
             if(info){
                 info = JSON.parse(info)
-                info.forEach(i =>
+                info.forEach(({title, description}) =>
                     ArtInfo.create({
-                        title: i.title,
-                        descriptoin: i.descriptoin,
-                        artId: art.id
+                        artId: art.id,
+                        title,
+                        description
                     }))
             }
 
-            // if(artistId){
-            //     artistId = JSON.parse(artistId)
-            //     artistId.forEach(i =>
-            //         ArtArtist.create({
-            //             artistId: i.artistId,
-            //             artId: art.id
-            //         }))
-            //     }
+            if(artistId){
+                artistId = JSON.parse(artistId)
+                artistId.forEach(({ artistId }) =>
+                    ArtArtist.create({
+                        artId: art.id,
+                        artistId,
+                    }))
+                }
 
            
             return res.json(art)
@@ -71,7 +72,7 @@ class ArtController {
             {
                 where: {id},
                 include: [{model: ArtInfo, as: 'info'}],
-                // include: [{model: ArtArtist, as: 'artist'}]
+                include: [{model: ArtArtist, as: 'artist'}]
             }
         )
         return res.json(art)
