@@ -29,6 +29,16 @@ class ArtistController {
         return res.json(artists)
     }
     
+    async getOne(req, res) {
+        const {id} = req.params
+        const artist = await Artist.findOne(
+            {
+                where: {id}
+            }
+        )
+        return res.json(artist)
+    }
+
     async delete(req, res) {
 
     }

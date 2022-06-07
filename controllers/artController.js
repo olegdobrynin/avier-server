@@ -1,6 +1,6 @@
 const uuid = require('uuid')
 const path = require('path')
-const {Art, ArtInfo, ArtArtist} = require('../models/models')
+const {Art, ArtInfo, Artist, ArtArtist} = require('../models/models')
 const ApiError = require('../error/ApiError')
 
 class ArtController {
@@ -25,7 +25,7 @@ class ArtController {
             }
 
             if(artistId){
-                artistId = JSON.parse(artistId)
+                // artistId = JSON.parse(artistId)
                 artistId.forEach(({ artistId }) =>
                     ArtArtist.create({
                         artId: art.id,
@@ -71,8 +71,7 @@ class ArtController {
         const art = await Art.findOne(
             {
                 where: {id},
-                include: [{model: ArtInfo, as: 'info'}],
-                include: [{model: ArtArtist, as: 'artist'}]
+                include: [{model: ArtInfo, as: 'info'}, {model: Artist, as: 'artist'}],
             }
         )
         return res.json(art)
