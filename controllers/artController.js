@@ -7,14 +7,13 @@ class ArtController {
 
     async create(req, res, next) {
         try {
-            console.log(req.body);
-            let {name, about, city, year, typeId, artistId, info} = req.body
+            let {name, about, city, year, typeId, artistId = '', info = '[]'} = req.body
             const {img} = req.files
             let fileName = uuid.v4() + ".jpg"
             img.mv(path.resolve(__dirname, '..', 'static', fileName))
             const art = await Art.create({name, about, city, year, typeId, img: fileName})
 
-            if(info){
+
                 info = JSON.parse(info)
                 info.forEach(({title, description}) =>
                     ArtInfo.create({
@@ -22,16 +21,16 @@ class ArtController {
                         title,
                         description
                     }))
-            }
 
-            if(artistId){
-                // artistId = JSON.parse(artistId)
-                artistId.forEach(({ artistId }) =>
+
+                const artistIds = artistId.split(',')
+                artistIds.forEach( ( artistId ) =>
                     ArtArtist.create({
                         artId: art.id,
-                        artistId,
-                    }))
-                }
+                        artistId: Number(artistId),
+                    })
+                    )
+
 
            
             return res.json(art)
@@ -78,7 +77,12 @@ class ArtController {
     }
     
     async delete(req, res) {
-
+        const {id} = req.query
+        console.log(id)
+        await Art.destroy({ where: {id} })
+        await ArtInfo.destroy({ where: { artId: {id} } })
+        ArtArtist.destroy({ where: { artId: {id} } })
+        return res.json(id);
     }
 
 }
