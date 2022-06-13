@@ -8,5 +8,6 @@ router.route('/')
   .post(ArtistController.create);
 router.route('/:id(\\d+)')
   .get(ArtistController.getOne)
+  .patch(ArtistController.update);
 
 export default router;
