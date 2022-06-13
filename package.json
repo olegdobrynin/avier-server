@@ -1,9 +1,9 @@
 {
   "name": "avier-server",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "./bin/app.js",
   "scripts": {
-    "dev": "nodemon index.js"
+    "dev": "nodemon"
   },
   "description": "Server for AVIER",
   "keywords": [],
