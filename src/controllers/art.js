@@ -3,7 +3,11 @@ import path from 'path';
 import models from '../models/index.js';
 import ApiError from '../errors/ApiError.js';
 
-const { Art, ArtInfo, ArtArtist } = models;
+const { Art, Artist, ArtInfo, ArtArtist } = models;
+
+const artistModel = {
+  model: Artist, as: 'artists', attributes: ['id', 'name'], through: { attributes: [] },
+};
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const buildImgPath = (imgName) => path.resolve(__dirname, '..', '..', 'static', 'arts', imgName);
@@ -36,26 +40,44 @@ export default class ArtController {
     }
   }
 
-    async getAll(req, res) {
-        let {artistId, typeId, limit, page} = req.query
-        page = page || 1
-        limit = limit || 9
-        let offset = page * limit - limit
-        let arts;
-        if (!artistId && !typeId) {
-            arts = await Art.findAndCountAll({limit, offset})
-            }
-        if (artistId && !typeId) {
-            arts = await Art.findAndCountAll({where:{artistId}, limit, offset})
-            }
-        if (!artistId && typeId) {
-            arts = await Art.findAndCountAll({where:{typeId}, limit, offset})            
-            }
-        if (artistId && typeId) {
-            arts = await Art.findAndCountAll({where:{artistId, typeId}, limit, offset})            
-        }
-        return res.json(arts)
+  static async getAll(req, res, next) {
+    try {
+      const {
+        artistId, typeId, limit = 9, page = 1,
+      } = req.query;
+      const offset = (page - 1) * limit;
+
+      let countParameters = {};
+      let findParameters = {
+        attributes: ['id', 'name', 'img'],
+        include: [artistModel],
+        order: [['id', 'DESC']],
+        limit,
+        offset,
+      };
+
+      if (artistId) {
+        countParameters = {
+          ...countParameters,
+          include: { model: Artist, as: 'artists', where: { id: Number(artistId) } },
+        };
+        findParameters = {
+          ...findParameters,
+          include: { ...artistModel, where: { id: Number(artistId) } },
+        };
+      }
+      if (typeId) {
+        countParameters = { ...countParameters, where: { type_id: Number(typeId) } };
+        findParameters = { ...findParameters, where: { type_id: Number(typeId) } };
+      }
+      const arts = await Art.findAll(findParameters);
+      const count = await Art.count(countParameters);
+
+      res.json({ count, rows: arts });
+    } catch (error) {
+      next(new ApiError(error, 500));
     }
+  }
 
     async getOne(req, res) {
         const {id} = req.params
