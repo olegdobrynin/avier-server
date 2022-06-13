@@ -1,7 +1,11 @@
 import { Model } from 'sequelize';
 
 export default (sequelize, DataTypes) => {
-  class Type extends Model {}
+  class Type extends Model {
+    static associate({ Art }) {
+      this.hasMany(Art, { foreignKey: 'type_id' });
+    }
+  }
 
   Type.init({
     name: {
