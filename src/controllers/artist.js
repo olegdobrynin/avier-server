@@ -3,6 +3,7 @@ import path from 'path';
 import models from '../models/index.js';
 import sequelize from '../db/db.js';
 import ApiError from '../errors/ApiError.js';
+import NotFoundError from '../errors/NotFoundError.js';
 
 const { Artist } = models;
 
@@ -22,6 +23,24 @@ export default class ArtistController {
 
         res.status(201).json({ id });
       });
+    } catch (error) {
+      next(new ApiError(error, 500));
+    }
+  }
+
+  static async getOne(req, res, next) {
+    try {
+      const { id } = req.params;
+      const artist = await Artist.findOne({
+        where: { id },
+        attributes: ['name', 'bio', 'img'],
+      });
+
+      if (artist) {
+        res.json(artist);
+      } else {
+        next(new NotFoundError());
+      }
     } catch (error) {
       next(new ApiError(error, 500));
     }
