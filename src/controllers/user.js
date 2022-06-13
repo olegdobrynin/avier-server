@@ -5,7 +5,7 @@ import sequelize from '../db/db.js';
 import ApiError from '../errors/ApiError.js';
 import NotFoundError from '../errors/NotFoundError.js';
 
-const { Artist, User } = models;
+const { Artist, Mark, User } = models;
 
 const generateJwt = (id, login, role) => jwt.sign(
   { id, login, role },
@@ -32,6 +32,7 @@ export default class UserController {
           { login, role, password: hashPassword },
           { returning: ['id', 'login', 'role'], transaction },
         );
+        await Mark.create({ user_id: user.id }, { returning: false, transaction });
 
         const token = generateJwt(user.id, user.login, user.role);
         res.json({ token });
