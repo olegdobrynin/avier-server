@@ -1,9 +1,9 @@
-Setup:
+## Setup:
 ```bash
 make
 
 ```
-Run:
+## Run:
 ```bash
 SECRET_KEY=AVIER make start
 
