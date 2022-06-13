@@ -1,10 +1,11 @@
 {
-  "name": "server",
+  "name": "avier-server",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
     "dev": "nodemon index.js"
   },
+  "description": "Server for AVIER",
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -22,6 +23,5 @@
   },
   "devDependencies": {
     "nodemon": "^2.0.15"
-  },
-  "description": ""
+  }
 }
