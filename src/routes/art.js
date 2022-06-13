@@ -1,10 +1,11 @@
 import Router from 'express';
-import ArtController from '../c/art.js';
+import ArtController from '../controllers/art.js';
 
 const router = new Router();
 
 router.route('/:id(\\d+)')
-  .get(ArtController.getOne);
+  .get(ArtController.getOne)
+  .delete(ArtController.delete);
 router.route('/')
   .get(ArtController.getAll)
   .post(ArtController.create);
