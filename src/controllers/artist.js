@@ -55,4 +55,29 @@ export default class ArtistController {
       next(new ApiError(error, 500));
     }
   }
+
+  static async update(req, res, next) {
+    try {
+      await sequelize.transaction(async (transaction) => {
+        const { id } = req.params;
+        const { name, bio } = req.body;
+        const artist = await Artist.findOne({ where: { id }, returning: ['img'], transaction });
+        if (artist) {
+          const { img: oldImgName } = artist;
+          const newImgName = oldImgName === 'default.jpg' && req.files?.img
+            ? `${v4()}.jpg`
+            : oldImgName;
+
+          await artist.update({ name, bio, img: newImgName }, { transaction });
+          await req.files?.img?.mv(buildImgPath(newImgName));
+
+          res.status(204).end();
+        } else {
+          next(new NotFoundError());
+        }
+      });
+    } catch (error) {
+      next(new ApiError(error, 500));
+    }
+  }
 }
