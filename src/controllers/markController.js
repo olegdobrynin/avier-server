@@ -1,4 +1,4 @@
-class MarkController {
+export default class MarkController {
     
     async mark(req, res) {
 
@@ -13,5 +13,3 @@ class MarkController {
     }
 
 }
-
-module.exports = new MarkController()
