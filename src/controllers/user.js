@@ -3,8 +3,9 @@ import jwt from 'jsonwebtoken';
 import models from '../models/index.js';
 import sequelize from '../db/db.js';
 import ApiError from '../errors/ApiError.js';
+import NotFoundError from '../errors/NotFoundError.js';
 
-const { User } = models;
+const { Artist, User } = models;
 
 const generateJwt = (id, login, role) => jwt.sign(
   { id, login, role },
@@ -67,6 +68,25 @@ export default class UserController {
       const token = generateJwt(id, login, role);
 
       res.json({ token });
+    } catch (error) {
+      next(new ApiError(error, 500));
+    }
+  }
+
+  static async info(req, res, next) {
+    try {
+      const { id } = req.params;
+      const user = await User.findOne({
+        where: { id },
+        attributes: ['login'],
+        include: { model: Artist, as: 'artists', attributes: ['id', 'name', 'img'] },
+      });
+
+      if (user) {
+        res.json(user);
+      } else {
+        next(new NotFoundError());
+      }
     } catch (error) {
       next(new ApiError(error, 500));
     }
