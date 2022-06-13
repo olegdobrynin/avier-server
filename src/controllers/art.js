@@ -1,4 +1,4 @@
-import uuid from 'uuid';
+import { v4 } from 'uuid';
 import path from 'path';
 import models from '../models/index.js';
 import ApiError from '../errors/ApiError.js';
@@ -6,47 +6,35 @@ import ApiError from '../errors/ApiError.js';
 const { Art, ArtInfo, ArtArtist } = models;
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
+const buildImgPath = (imgName) => path.resolve(__dirname, '..', '..', 'static', 'arts', imgName);
 
 export default class ArtController {
+  static async create(req, res, next) {
+    try {
+      await sequelize.transaction(async (transaction) => {
+        const { typeId, artistId = '[]', property = '[]' } = req.body;
+        const imgName = req.files?.img ? `${v4()}.jpg` : 'default.jpg';
 
-    async create(req, res, next) {
-        try {
-            let {name, about, city, year, typeId, artistId, info} = req.body
-            const {img} = req.files
-            let fileName = uuid.v4() + ".jpg"
-            img.mv(path.resolve(__dirname, '..', 'static', fileName))
-            const art = await Art.create({name, about, city, year, typeId, img: fileName})
+        const { id: artId } = await Art.create(
+          { ...req.body, type_id: typeId, img: imgName },
+          { returning: ['id'], transaction },
+        );
 
-            if(info){
-                info = JSON.parse(info)
-                info.forEach(i =>
-                    ArtInfo.create({
-                        title: i.title,
-                        descriptoin: i.descriptoin,
-                        artId: art.id
-                    }))
-            }
+        const properties = JSON.parse(property)
+          .map((prop) => ({ ...prop, art_id: Number(artId) }));
+        const artArtists = JSON.parse(artistId)
+          .map((id) => ({ art_id: Number(artId), artist_id: Number(id) }));
 
-            // if(artistId){
-            //     artistId = JSON.parse(artistId)
-            //     artistId.forEach(i =>
-            //         ArtArtist.create({
-            //             artistId: i.artistId,
-            //             artId: art.id
-            //         }))
-            //     }
+        await ArtProp.bulkCreate(properties, { returning: false, transaction });
+        await ArtArtist.bulkCreate(artArtists, { returning: false, transaction });
+        await req.files?.img?.mv(buildImgPath(imgName));
 
-           
-            return res.json(art)
-        } catch (e) {
-            next(ApiError.badRequest(e.message))
-        }
-        
+        res.status(201).json({ id: artId });
+      });
+    } catch (error) {
+      next(new ApiError(error, 500));
     }
-
-    async edit(req, res) {
-
-    }
+  }
 
     async getAll(req, res) {
         let {artistId, typeId, limit, page} = req.query
