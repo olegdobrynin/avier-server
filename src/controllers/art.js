@@ -1,11 +1,14 @@
 import { v4 } from 'uuid';
+import fs from 'fs/promises';
 import path from 'path';
 import models from '../models/index.js';
 import sequelize from '../db/db.js';
 import ApiError from '../errors/ApiError.js';
 import NotFoundError from '../errors/NotFoundError.js';
 
-const { Art, Artist, ArtInfo, ArtArtist } = models;
+const {
+  Art, ArtProp, Artist, ArtArtist,
+} = models;
 
 const artPropModel = { model: ArtProp, as: 'properties', attributes: ['title', 'description'] };
 const artistModel = {
@@ -100,10 +103,26 @@ export default class ArtController {
       next(new ApiError(error, 500));
     }
   }
-    
-    async delete(req, res) {
 
+  static async delete(req, res, next) {
+    try {
+      await sequelize.transaction(async (transaction) => {
+        const { id } = req.params;
+        const art = await Art.findOne({ where: { id }, transaction });
+        if (art) {
+          const { name, img: imgName } = art;
+
+          await art.destroy({ transaction });
+          if (imgName !== 'default.jpg') {
+            await fs.rm(buildImgPath(imgName));
+          }
+          res.json({ message: `Произведение '${name}' удалено.` });
+        } else {
+          next(new NotFoundError());
+        }
+      });
+    } catch (error) {
+      next(new ApiError(error, 500));
     }
-
+  }
 }
-
