@@ -1,5 +1,6 @@
 import { v4 } from 'uuid';
 import path from 'path';
+import fs from 'fs/promises';
 import models from '../models/index.js';
 import sequelize from '../db/db.js';
 import ApiError from '../errors/ApiError.js';
@@ -72,6 +73,28 @@ export default class ArtistController {
           await req.files?.img?.mv(buildImgPath(newImgName));
 
           res.status(204).end();
+        } else {
+          next(new NotFoundError());
+        }
+      });
+    } catch (error) {
+      next(new ApiError(error, 500));
+    }
+  }
+
+  static async delete(req, res, next) {
+    try {
+      await sequelize.transaction(async (transaction) => {
+        const { id } = req.params;
+        const artist = await Artist.findOne({ where: { id }, returning: ['name', 'img'], transaction });
+        if (artist) {
+          const { name, img: imgName } = artist;
+
+          await artist.destroy({ transaction });
+          if (imgName !== 'default.jpg') {
+            await fs.rm(buildImgPath(imgName));
+          }
+          res.json({ message: `Художник '${name}' удалён.` });
         } else {
           next(new NotFoundError());
         }
