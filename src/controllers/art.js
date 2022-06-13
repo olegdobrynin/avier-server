@@ -1,10 +1,13 @@
 import { v4 } from 'uuid';
 import path from 'path';
 import models from '../models/index.js';
+import sequelize from '../db/db.js';
 import ApiError from '../errors/ApiError.js';
+import NotFoundError from '../errors/NotFoundError.js';
 
 const { Art, Artist, ArtInfo, ArtArtist } = models;
 
+const artPropModel = { model: ArtProp, as: 'properties', attributes: ['title', 'description'] };
 const artistModel = {
   model: Artist, as: 'artists', attributes: ['id', 'name'], through: { attributes: [] },
 };
@@ -79,17 +82,24 @@ export default class ArtController {
     }
   }
 
-    async getOne(req, res) {
-        const {id} = req.params
-        const art = await Art.findOne(
-            {
-                where: {id},
-                include: [{model: ArtInfo, as: 'info'}],
-                // include: [{model: ArtArtist, as: 'artist'}]
-            }
-        )
-        return res.json(art)
+  static async getOne(req, res, next) {
+    try {
+      const { id } = req.params;
+      const art = await Art.findOne({
+        where: { id },
+        include: [artistModel, artPropModel],
+        attributes: ['name', 'year', 'about', 'city', 'img', 'like'],
+      });
+
+      if (art) {
+        res.json(art);
+      } else {
+        next(new NotFoundError());
+      }
+    } catch (error) {
+      next(new ApiError(error, 500));
     }
+  }
     
     async delete(req, res) {
 
