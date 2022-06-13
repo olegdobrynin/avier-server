@@ -2,8 +2,15 @@ import { Model } from 'sequelize';
 
 export default (sequelize, DataTypes) => {
   class Art extends Model {
-    static associate({ Type }) {
+    static associate({
+      ArtProp, Artist, ArtArtist, Type,
+    }) {
+      this.hasMany(ArtProp, {
+        foreignKey: 'art_id', as: 'properties', hooks: true, onDelete: 'CASCADE',
+      });
+      this.hasMany(ArtArtist, { foreignKey: 'art_id', hooks: true, onDelete: 'CASCADE' });
       this.belongsTo(Type, { foreignKey: 'type_id', as: 'type' });
+      this.belongsToMany(Artist, { through: ArtArtist, foreignKey: 'art_id', as: 'artists' });
     }
   }
 
