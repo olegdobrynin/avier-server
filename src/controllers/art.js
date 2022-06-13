@@ -1,9 +1,13 @@
-const uuid = require('uuid')
-const path = require('path')
-const {Art, ArtInfo, ArtArtist} = require('../../../old_server/models/models')
-const ApiError = require('../../../old_server/error/ApiError')
+import uuid from 'uuid';
+import path from 'path';
+import models from '../models/index.js';
+import ApiError from '../errors/ApiError.js';
 
-class ArtController {
+const { Art, ArtInfo, ArtArtist } = models;
+
+const __dirname = path.dirname(new URL(import.meta.url).pathname);
+
+export default class ArtController {
 
     async create(req, res, next) {
         try {
@@ -83,4 +87,3 @@ class ArtController {
 
 }
 
-module.exports = new ArtController()
