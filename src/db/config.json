@@ -9,6 +9,15 @@
     "dialect": "postgres",
     "timezone": "+00:00"
   },
+  "env": {
+    "username": "DB_USERNAME",
+    "password": "DB_PASSWORD",
+    "database": "DB_DATABASE",
+    "host": "DB_HOST",
+    "port": 5432,
+    "dialect": "postgres",
+    "timezone": "+00:00"
+  },
   "test": {
     "username": "postgres",
     "password": null,
