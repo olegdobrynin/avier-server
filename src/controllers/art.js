@@ -1,6 +1,7 @@
 import { v4 } from 'uuid';
-import fs from 'fs/promises';
 import path from 'path';
+import { fileURLToPath } from 'url';
+import fs from 'fs/promises';
 import models from '../models/index.js';
 import sequelize from '../db/db.js';
 import ApiError from '../errors/ApiError.js';
@@ -15,7 +16,7 @@ const artistModel = {
   model: Artist, as: 'artists', attributes: ['id', 'name'], through: { attributes: [] },
 };
 
-const __dirname = path.dirname(new URL(import.meta.url).pathname);
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const buildImgPath = (imgName) => path.resolve(__dirname, '..', '..', 'static', 'arts', imgName);
 
 export default class ArtController {
