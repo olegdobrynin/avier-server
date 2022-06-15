@@ -10,7 +10,7 @@ const { base: basename, dir: __dirname } = path.parse(__filename);
 const promises = fs
   .readdirSync(__dirname)
   .filter((file) => file.indexOf('.') !== 0 && file !== basename && file.slice(-3) === '.js')
-  .map((file) => import(`./${file}`)));
+  .map((file) => import(`./${file}`));
 
 const modules = await Promise.all(promises);
 const models = modules
