@@ -1,9 +1,9 @@
 import { readFileSync } from 'fs';
-import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import Sequelize from 'sequelize';
+import path from 'path';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const pathToConfig = path.resolve(__dirname, 'config.json');
 const configFile = JSON.parse(readFileSync(pathToConfig, 'utf-8'));
 const env = process.env.NODE_ENV ?? 'development';
