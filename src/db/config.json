@@ -1,8 +1,7 @@
 {
   "development": {
-    "use_env_variable": "DATABASE_URL",
     "username": "postgres",
-    "password": null,
+    "password": "root",
     "database": "avier",
     "host": "localhost",
     "port": 5432,
