@@ -1,20 +1,20 @@
-{
-  "development": {
-    "username": "postgres",
-    "password": null,
-    "database": "avier",
-    "host": "localhost",
-    "port": 5432,
-    "dialect": "postgres",
-    "timezone": "+00:00"
+import 'dotenv/config';
+
+export default {
+  development: {
+    username: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    dialect: 'postgres',
   },
-  "test": {
-    "username": "postgres",
-    "password": null,
-    "database": "avier_test",
-    "host": "localhost",
-    "port": 5432,
-    "dialect": "postgres",
-    "timezone": "+00:00"
-  }
-}
+  test: {
+    username: 'postgres',
+    password: 'root',
+    database: 'avier_test',
+    host: 'localhost',
+    port: 5432,
+    dialect: 'postgres',
+  },
+};
