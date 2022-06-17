@@ -3,12 +3,13 @@ import { Model } from 'sequelize';
 export default (sequelize, DataTypes) => {
   class Art extends Model {
     static associate({
-      ArtProp, Artist, ArtArtist, Mark, MarkArt, Type,
+      ArtExtraImg, ArtProp, Artist, ArtArtist, Mark, MarkArt, Type,
     }) {
+      this.hasMany(ArtArtist, { foreignKey: 'art_id', hooks: true, onDelete: 'CASCADE' });
+      this.hasMany(ArtExtraImg, { foreignKey: 'art_id', hooks: true, onDelete: 'CASCADE' });
       this.hasMany(ArtProp, {
         foreignKey: 'art_id', as: 'properties', hooks: true, onDelete: 'CASCADE',
       });
-      this.hasMany(ArtArtist, { foreignKey: 'art_id', hooks: true, onDelete: 'CASCADE' });
       this.hasMany(MarkArt, { foreignKey: 'art_id', hooks: true, onDelete: 'CASCADE' });
       this.belongsTo(Type, { foreignKey: 'type_id', as: 'type' });
       this.belongsToMany(Artist, { through: ArtArtist, foreignKey: 'art_id', as: 'artists' });
