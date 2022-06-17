@@ -1,7 +1,10 @@
-setup: install create-db db-migrate
+setup: install prepare create-db db-migrate
 
 install:
 	npm ci
+
+prepare:
+	-cp -n .env.example .env
 
 start:
 	npm run dev -s
