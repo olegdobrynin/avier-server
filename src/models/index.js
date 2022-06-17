@@ -9,7 +9,7 @@ const { base: basename, dir: __dirname } = path.parse(__filename);
 
 const promises = fs
   .readdirSync(__dirname)
-  .filter((file) => file.indexOf('.') !== 0 && file !== basename && file.slice(-3) === '.js')
+  .filter((file) => !file.startsWith('.') && file !== basename && file.endsWith('.js'))
   .map((file) => import(`./${file}`));
 
 const modules = await Promise.all(promises);
