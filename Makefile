@@ -1,4 +1,4 @@
-all: install create-db db-migrate
+setup: install create-db db-migrate
 
 install:
 	npm ci
