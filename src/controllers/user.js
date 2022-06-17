@@ -1,5 +1,6 @@
 import { hash, compareSync } from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { Op } from 'sequelize';
 import models from '../models/index.js';
 import sequelize from '../db/db.js';
 import ApiError from '../errors/ApiError.js';
@@ -21,7 +22,7 @@ export default class UserController {
         next(new ApiError({ message: 'Неккоректный логин или пароль' }, 404));
         return;
       }
-      const candidate = await User.findOne({ where: { login } });
+      const candidate = await User.findOne({ where: { login: { [Op.iLike]: login } } });
       if (candidate) {
         next(new ApiError({ message: 'Такой логин уже зарегистрирован' }, 404));
         return;
