@@ -78,8 +78,7 @@ export default class UserController {
   static async info(req, res, next) {
     try {
       const { id } = req.params;
-      const user = await User.findOne({
-        where: { id },
+      const user = await User.findByPk(id, {
         attributes: ['login'],
         include: { model: Artist, as: 'artists', attributes: ['id', 'name', 'img'] },
       });
