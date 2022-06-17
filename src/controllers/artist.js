@@ -33,10 +33,7 @@ export default class ArtistController {
   static async getOne(req, res, next) {
     try {
       const { id } = req.params;
-      const artist = await Artist.findOne({
-        where: { id },
-        attributes: ['name', 'bio', 'img'],
-      });
+      const artist = await Artist.findByPk(id, { attributes: ['name', 'bio', 'img'] });
 
       if (artist) {
         res.json(artist);
@@ -63,7 +60,7 @@ export default class ArtistController {
       await sequelize.transaction(async (transaction) => {
         const { id } = req.params;
         const { name, bio } = req.body;
-        const artist = await Artist.findOne({ where: { id }, returning: ['img'], transaction });
+        const artist = await Artist.findByPk(id, { returning: ['img'], transaction });
         if (artist) {
           const { img: oldImgName } = artist;
           const newImgName = oldImgName === 'default.jpg' && req.files?.img
@@ -87,7 +84,7 @@ export default class ArtistController {
     try {
       await sequelize.transaction(async (transaction) => {
         const { id } = req.params;
-        const artist = await Artist.findOne({ where: { id }, returning: ['name', 'img'], transaction });
+        const artist = await Artist.findByPk(id, { returning: ['name', 'img'], transaction });
         if (artist) {
           const { name, img: imgName } = artist;
 
