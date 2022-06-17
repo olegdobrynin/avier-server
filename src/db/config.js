@@ -1,7 +1,7 @@
 {
   "development": {
     "username": "postgres",
-    "password": "root",
+    "password": null,
     "database": "avier",
     "host": "localhost",
     "port": 5432,
