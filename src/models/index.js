@@ -4,7 +4,7 @@ import { fileURLToPath } from 'url';
 import { DataTypes } from 'sequelize';
 import sequelize from '../db/db.js';
 
-const __filename  = fileURLToPath(import.meta.url);
+const __filename = fileURLToPath(import.meta.url);
 const { base: basename, dir: __dirname } = path.parse(__filename);
 
 const promises = fs
