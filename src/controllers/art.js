@@ -89,8 +89,7 @@ export default class ArtController {
   static async getOne(req, res, next) {
     try {
       const { id } = req.params;
-      const art = await Art.findOne({
-        where: { id },
+      const art = await Art.findByPk(id, {
         include: [artistModel, artPropModel],
         attributes: ['name', 'year', 'about', 'city', 'img', 'like'],
       });
@@ -109,7 +108,7 @@ export default class ArtController {
     try {
       await sequelize.transaction(async (transaction) => {
         const { id } = req.params;
-        const art = await Art.findOne({ where: { id }, transaction });
+        const art = await Art.findByPk(id, { transaction });
         if (art) {
           const { name, img: imgName } = art;
 
