@@ -1,10 +1,10 @@
 ## Setup:
 ```bash
-make
+make setup
 
 ```
 ## Run:
 ```bash
-SECRET_KEY=AVIER make start
+make start
 
 ```
