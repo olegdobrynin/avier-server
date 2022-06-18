@@ -6,7 +6,9 @@ export default (sequelize, DataTypes) => {
       ArtExtraImg, ArtProp, Artist, ArtArtist, Mark, MarkArt, Type,
     }) {
       this.hasMany(ArtArtist, { foreignKey: 'art_id', hooks: true, onDelete: 'CASCADE' });
-      this.hasMany(ArtExtraImg, { foreignKey: 'art_id', hooks: true, onDelete: 'CASCADE' });
+      this.hasMany(ArtExtraImg, {
+        foreignKey: 'art_id', as: 'extraImgs', hooks: true, onDelete: 'CASCADE',
+      });
       this.hasMany(ArtProp, {
         foreignKey: 'art_id', as: 'properties', hooks: true, onDelete: 'CASCADE',
       });
