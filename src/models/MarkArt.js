@@ -1,9 +1,7 @@
 import { Model } from 'sequelize';
 
 export default (sequelize, DataTypes) => {
-  class MarkArt extends Model {
-    static associate() {}
-  }
+  class MarkArt extends Model {}
 
   MarkArt.init({
     mark_id: {
