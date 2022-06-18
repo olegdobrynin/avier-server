@@ -9,7 +9,7 @@ export default (sequelize, DataTypes) => {
 
   Type.init({
     name: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(20),
       unique: true,
       allowNull: false,
     },
