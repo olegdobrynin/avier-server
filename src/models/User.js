@@ -13,7 +13,7 @@ export default (sequelize, DataTypes) => {
 
   User.init({
     login: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(32),
       unique: true,
       allowNull: false,
     },
