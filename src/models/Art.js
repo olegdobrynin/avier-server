@@ -38,7 +38,7 @@ export default (sequelize, DataTypes) => {
       type: DataTypes.TEXT,
     },
     city: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(25),
     },
     img: {
       type: DataTypes.STRING(40),
