@@ -22,9 +22,9 @@ export default (sequelize, DataTypes) => {
       allowNull: false,
     },
     role: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(5),
       allowNull: false,
-      defaultValue: 'user',
+      defaultValue: 'USER',
     },
   }, {
     sequelize,
