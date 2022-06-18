@@ -41,7 +41,9 @@ export default (sequelize, DataTypes) => {
       type: DataTypes.STRING,
     },
     img: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(40),
+      allowNull: false,
+      defaultValue: 'default.jpg',
     },
     like: {
       type: DataTypes.INTEGER,
