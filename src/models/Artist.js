@@ -11,7 +11,7 @@ export default (sequelize, DataTypes) => {
 
   Artist.init({
     name: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(50),
       allowNull: false,
     },
     user_id: {
