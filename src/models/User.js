@@ -18,7 +18,7 @@ export default (sequelize, DataTypes) => {
       allowNull: false,
     },
     password: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(60),
       allowNull: false,
     },
     role: {
