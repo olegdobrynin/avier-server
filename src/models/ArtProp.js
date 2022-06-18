@@ -16,7 +16,7 @@ export default (sequelize, DataTypes) => {
       },
     },
     title: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(20),
       allowNull: false,
     },
     description: {
