@@ -28,7 +28,7 @@ export default (sequelize, DataTypes) => {
       },
     },
     name: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(100),
       allowNull: false,
     },
     year: {
