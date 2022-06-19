@@ -108,7 +108,7 @@ export default class ArtController {
     try {
       await sequelize.transaction(async (transaction) => {
         const { id } = req.params;
-        const art = await Art.findByPk(id, { transaction });
+        const art = await Art.findByPk(id, { attributes: ['id', 'name', 'img'], transaction });
         if (art) {
           const { name, img: imgName } = art;
 
