@@ -57,7 +57,6 @@ export default class ArtController {
       let findParameters = {
         distinct: true,
         attributes: ['id', 'name', 'img'],
-        include: [artistModel],
         order: [['id', 'DESC']],
         limit,
         offset,
@@ -65,7 +64,8 @@ export default class ArtController {
 
       if (artistId) {
         findParameters = {
-          ...findParameters, include: { ...artistModel, where: { id: Number(artistId) } },
+          ...findParameters,
+          include: { ...artistModel, attributes: [], where: { id: Number(artistId) } },
         };
       }
       if (typeId) {
