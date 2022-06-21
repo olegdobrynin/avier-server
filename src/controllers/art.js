@@ -50,12 +50,12 @@ export default class ArtController {
   static async getAll(req, res, next) {
     try {
       const {
-        artistId, typeId, limit = 9, page = 1,
+        artistId, typeId, limit = 8, page = 1,
       } = req.query;
       const offset = (page - 1) * limit;
 
-      let countParameters = {};
       let findParameters = {
+        distinct: true,
         attributes: ['id', 'name', 'img'],
         include: [artistModel],
         order: [['id', 'DESC']],
@@ -64,23 +64,16 @@ export default class ArtController {
       };
 
       if (artistId) {
-        countParameters = {
-          ...countParameters,
-          include: { model: Artist, as: 'artists', where: { id: Number(artistId) } },
-        };
         findParameters = {
-          ...findParameters,
-          include: { ...artistModel, where: { id: Number(artistId) } },
+          ...findParameters, include: { ...artistModel, where: { id: Number(artistId) } },
         };
       }
       if (typeId) {
-        countParameters = { ...countParameters, where: { type_id: Number(typeId) } };
         findParameters = { ...findParameters, where: { type_id: Number(typeId) } };
       }
-      const arts = await Art.findAll(findParameters);
-      const count = await Art.count(countParameters);
+      const arts = await Art.findAndCountAll(findParameters);
 
-      res.json({ count, rows: arts });
+      res.json(arts);
     } catch (error) {
       next(new ApiError(error, 500));
     }
