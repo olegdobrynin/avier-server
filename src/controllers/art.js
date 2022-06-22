@@ -123,13 +123,18 @@ export default class ArtController {
     try {
       await sequelize.transaction(async (transaction) => {
         const { id } = req.params;
-        const art = await Art.findByPk(id, { attributes: ['id', 'name', 'img'], transaction });
+        const art = await Art
+          .findByPk(Number(id), { attributes: ['id', 'name', 'img'], transaction });
         if (art) {
           const { name, img: mainImgName } = art;
+          const extraImgNames = await ArtExtraImg
+            .findAll({ where: { art_id: Number(id) }, attributes: ['img'], transaction });
 
           await art.destroy({ transaction });
           if (mainImgName !== 'default.jpg') {
-            await fs.rm(buildImgPath(mainImgName));
+            const promises = [{ img: mainImgName }, ...extraImgNames]
+              .map(({ img: imgName }) => fs.rm(buildImgPath(imgName)));
+            await Promise.all(promises);
           }
           res.json({ message: `Произведение '${name}' удалено.` });
         } else {
