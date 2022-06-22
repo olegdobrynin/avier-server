@@ -35,6 +35,7 @@ export default class ArtController {
           .filter(({ title, description }) => !title || !description)
           .map((prop) => ({ ...prop, art_id: Number(artId) }));
         const artArtists = JSON.parse(artistId)
+          .filter(({ artistId: id }) => id)
           .map((id) => ({ art_id: Number(artId), artist_id: Number(id) }));
 
         await ArtProp.bulkCreate(properties, { returning: false, transaction });
