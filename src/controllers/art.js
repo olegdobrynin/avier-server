@@ -107,9 +107,9 @@ export default class ArtController {
         include: [artistModel, artPropModel, artExtraImgModel],
         attributes: { exclude: ['id', 'type_id', 'created_at', 'updated_at'] },
       });
-      const { dataValues: { img, extraImgs } } = art;
 
       if (art) {
+        const { dataValues: { img, extraImgs } } = art;
         res.json({ ...art.toJSON(), imgs: [img, ...extraImgs.map(({ img }) => img)] });
       } else {
         next(new NotFoundError());
