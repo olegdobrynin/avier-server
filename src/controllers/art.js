@@ -23,7 +23,7 @@ export default class ArtController {
   static async create(req, res, next) {
     try {
       await sequelize.transaction(async (transaction) => {
-        const { typeId, artists = '[]', property = '[]' } = req.body;
+        const { typeId, artists = '[]', properties = '[]' } = req.body;
         const imgName = req.files?.img ? `${v4()}.jpg` : 'default.jpg';
 
         const { id: artId } = await Art.create(
@@ -31,14 +31,14 @@ export default class ArtController {
           { returning: ['id'], transaction },
         );
 
-        const properties = JSON.parse(property)
+        const artProperties = JSON.parse(properties)
           .filter(({ title, description }) => !title || !description)
-          .map((prop) => ({ ...prop, art_id: Number(artId) }));
+          .map((property) => ({ ...property, art_id: Number(artId) }));
         const artArtists = JSON.parse(artists)
           .filter(({ artistId }) => artistId)
           .map(({ artistId }) => ({ art_id: Number(artId), artist_id: Number(artistId) }));
 
-        await ArtProp.bulkCreate(properties, { returning: false, transaction });
+        await ArtProp.bulkCreate(artProperties, { returning: false, transaction });
         await ArtArtist.bulkCreate(artArtists, { returning: false, transaction });
         await req.files?.img?.mv(buildImgPath(imgName));
 
