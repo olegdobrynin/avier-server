@@ -125,11 +125,11 @@ export default class ArtController {
         const { id } = req.params;
         const art = await Art.findByPk(id, { attributes: ['id', 'name', 'img'], transaction });
         if (art) {
-          const { name, img: imgName } = art;
+          const { name, img: mainImgName } = art;
 
           await art.destroy({ transaction });
-          if (imgName !== 'default.jpg') {
-            await fs.rm(buildImgPath(imgName));
+          if (mainImgName !== 'default.jpg') {
+            await fs.rm(buildImgPath(mainImgName));
           }
           res.json({ message: `Произведение '${name}' удалено.` });
         } else {
