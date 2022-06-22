@@ -103,13 +103,14 @@ export default class ArtController {
   static async getOne(req, res, next) {
     try {
       const { id } = req.params;
-      const art = await Art.findByPk(id, {
-        include: [artistModel, artPropModel],
-        attributes: ['name', 'year', 'about', 'city', 'img', 'like'],
+      const art = await Art.findByPk(Number(id), {
+        include: [artistModel, artPropModel, artExtraImgModel],
+        attributes: { exclude: ['id', 'type_id', 'created_at', 'updated_at'] },
       });
+      const { dataValues: { img, extraImgs } } = art;
 
       if (art) {
-        res.json(art);
+        res.json({ ...art.toJSON(), imgs: [img, ...extraImgs.map(({ img }) => img)] });
       } else {
         next(new NotFoundError());
       }
