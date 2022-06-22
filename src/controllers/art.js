@@ -8,9 +8,10 @@ import ApiError from '../errors/ApiError.js';
 import NotFoundError from '../errors/NotFoundError.js';
 
 const {
-  Art, ArtProp, Artist, ArtArtist,
+  Art, ArtExtraImg, ArtProp, Artist, ArtArtist,
 } = models;
 
+const artExtraImgModel = { model: ArtExtraImg, as: 'extraImgs', attributes: ['img'] };
 const artPropModel = { model: ArtProp, as: 'properties', attributes: ['title', 'description'] };
 const artistModel = {
   model: Artist, as: 'artists', attributes: ['id', 'name'], through: { attributes: [] },
@@ -40,7 +41,25 @@ export default class ArtController {
 
         await ArtProp.bulkCreate(artProperties, { returning: false, transaction });
         await ArtArtist.bulkCreate(artArtists, { returning: false, transaction });
-        await req.files?.img?.mv(buildImgPath(mainImgName));
+
+        if (req.files?.img) {
+          if (Array.isArray(req.files.img)) {
+            const extraImgNames = [...Array(req.files.img.length - 1)]
+              .map(() => `${v4()}.jpg`);
+            const extraImgs = extraImgNames
+              .map((imgName) => ({ art_id: artId, img: imgName }));
+
+            await ArtExtraImg.bulkCreate(extraImgs, { returning: false, transaction });
+
+            const promises = [mainImgName, ...extraImgNames]
+              .map((imgName) => buildImgPath(imgName))
+              .map((imgPath, i) => req.files.img[i].mv(imgPath));
+
+            await Promise.all(promises);
+          } else {
+            await req.files.img.mv(buildImgPath(mainImgName));
+          }
+        }
 
         res.status(201).json({ id: artId });
       });
