@@ -32,6 +32,7 @@ export default class ArtController {
         );
 
         const properties = JSON.parse(property)
+          .filter(({ title, description }) => !title || !description)
           .map((prop) => ({ ...prop, art_id: Number(artId) }));
         const artArtists = JSON.parse(artistId)
           .map((id) => ({ art_id: Number(artId), artist_id: Number(id) }));
