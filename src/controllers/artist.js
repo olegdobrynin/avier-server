@@ -17,11 +17,13 @@ export default class ArtistController {
     try {
       await sequelize.transaction(async (transaction) => {
         const { userId } = req.body;
-        const imgName = req.files?.img ? `${v4()}.jpg` : 'default.jpg';
+        const imgName = req.file ? `${v4()}.jpg` : 'default.jpg';
 
         const createParams = { ...req.body, user_id: userId, img: imgName };
         const { id } = await Artist.create(createParams, { returning: ['id'], transaction });
-        await req.files?.img?.mv(buildImgPath(imgName));
+        if (req.file) {
+          await fs.writeFile(buildImgPath(imgName), req.file.buffer);
+        }
 
         res.status(201).json({ id });
       });
@@ -63,12 +65,14 @@ export default class ArtistController {
         const artist = await Artist.findByPk(id, { returning: ['img'], transaction });
         if (artist) {
           const { img: oldImgName } = artist;
-          const newImgName = oldImgName === 'default.jpg' && req.files?.img
+          const newImgName = oldImgName === 'default.jpg' && req.file
             ? `${v4()}.jpg`
             : oldImgName;
 
           await artist.update({ name, bio, img: newImgName }, { transaction });
-          await req.files?.img?.mv(buildImgPath(newImgName));
+          if (req.file) {
+            await fs.writeFile(buildImgPath(newImgName), req.file.buffer);
+          }
 
           res.status(204).end();
         } else {
