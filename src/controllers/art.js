@@ -25,7 +25,7 @@ export default class ArtController {
     try {
       await sequelize.transaction(async (transaction) => {
         const { typeId, artists = '[]', properties = '[]' } = req.body;
-        const mainImgName = req.files?.img ? `${v4()}.jpg` : 'default.jpg';
+        const mainImgName = req.files.length > 0 ? `${v4()}.jpg` : 'default.jpg';
 
         const { id: artId } = await Art.create(
           { ...req.body, type_id: typeId, img: mainImgName },
@@ -42,23 +42,19 @@ export default class ArtController {
         await ArtProp.bulkCreate(artProperties, { returning: false, transaction });
         await ArtArtist.bulkCreate(artArtists, { returning: false, transaction });
 
-        if (req.files?.img) {
-          if (Array.isArray(req.files.img)) {
-            const extraImgNames = [...Array(req.files.img.length - 1)]
-              .map(() => `${v4()}.jpg`);
-            const extraImgs = extraImgNames
-              .map((imgName) => ({ art_id: artId, img: imgName }));
+        if (req.files.length > 0) {
+          const extraImgNames = [...Array(req.files.length - 1)]
+            .map(() => `${v4()}.jpg`);
+          const extraImgs = extraImgNames
+            .map((imgName) => ({ art_id: artId, img: imgName }));
 
-            await ArtExtraImg.bulkCreate(extraImgs, { returning: false, transaction });
+          await ArtExtraImg.bulkCreate(extraImgs, { returning: false, transaction });
 
-            const promises = [mainImgName, ...extraImgNames]
-              .map((imgName) => buildImgPath(imgName))
-              .map((imgPath, i) => req.files.img[i].mv(imgPath));
+          const promises = [mainImgName, ...extraImgNames]
+            .map((imgName) => buildImgPath(imgName))
+            .map((imgPath, i) => fs.writeFile(imgPath, req.files[i].buffer));
 
-            await Promise.all(promises);
-          } else {
-            await req.files.img.mv(buildImgPath(mainImgName));
-          }
+          await Promise.all(promises);
         }
 
         res.status(201).json({ id: artId });
@@ -109,8 +105,8 @@ export default class ArtController {
       });
 
       if (art) {
-        const { dataValues: { img, extraImgs } } = art;
-        res.json({ ...art.toJSON(), imgs: [img, ...extraImgs.map(({ img }) => img)] });
+        const { dataValues: { img: mainImg, extraImgs } } = art;
+        res.json({ ...art.toJSON(), imgs: [mainImg, ...extraImgs.map(({ img }) => img)] });
       } else {
         next(new NotFoundError());
       }
