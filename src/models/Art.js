@@ -17,6 +17,10 @@ export default (sequelize, DataTypes) => {
       this.belongsToMany(Artist, { through: ArtArtist, foreignKey: 'art_id', as: 'artists' });
       this.belongsToMany(Mark, { through: MarkArt, foreignKey: 'art_id', as: 'marks' });
     }
+
+    toJSON() {
+      return { ...this.get(), extraImgs: undefined };
+    }
   }
 
   Art.init({
