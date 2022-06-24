@@ -6,7 +6,7 @@ install:
 prepare:
 	-cp -n .env.example .env
 
-start:
+start-dev:
 	npm run dev -s
 
 create-db:
