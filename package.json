@@ -4,7 +4,8 @@
   "main": "./bin/app.js",
   "type": "module",
   "scripts": {
-    "dev": "nodemon"
+    "dev": "nodemon",
+    "start": "./bin/app.js"
   },
   "description": "Server for AVIER",
   "keywords": [],
