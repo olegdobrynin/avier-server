@@ -6,6 +6,9 @@ install:
 prepare:
 	-cp -n .env.example .env
 
+start:
+	npm start -s
+
 start-dev:
 	npm run dev -s
 
