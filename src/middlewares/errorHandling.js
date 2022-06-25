@@ -8,7 +8,7 @@ export default (err, _req, res, _next) => {
     return;
   }
   if (err instanceof NotFoundError) {
-    res.status(404).send('He найден.');
+    res.status(404).json({ message: 'Не найден' });
     return;
   }
   res.status(500).json({ message: 'Непредвиденная ошибка!' });
