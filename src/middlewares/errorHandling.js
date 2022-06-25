@@ -1,7 +1,7 @@
 import ApiError from '../errors/ApiError.js';
 import NotFoundError from '../errors/NotFoundError.js';
 
-export default (err, _req, res) => {
+export default (err, _req, res, _next) => {
   const { status, message } = err;
   if (err instanceof ApiError) {
     res.status(status).json({ message });
