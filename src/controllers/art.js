@@ -27,6 +27,16 @@ export default class ArtController {
         const {
           name, typeId, year, city, about, artists = '[]', properties = '[]',
         } = req.body;
+        const filteredArtists = JSON.parse(artists).filter(({ artistId }) => artistId);
+        if (filteredArtists.length < 1) {
+          throw new Error('Выберите артиста.');
+        }
+        if (!typeId || typeId === 'undefined') {
+          throw new Error('Выберите тип.');
+        }
+        if (!name || name.length < 5) {
+          throw new Error('Введите название.');
+        }
         const mainImgName = req.files.length > 0 ? `${v4()}.jpg` : 'default.jpg';
 
         const { id: artId } = await Art.create(
@@ -44,8 +54,7 @@ export default class ArtController {
         const artProperties = JSON.parse(properties)
           .filter(({ title, description }) => title && description)
           .map((property) => ({ ...property, art_id: Number(artId) }));
-        const artArtists = JSON.parse(artists)
-          .filter(({ artistId }) => artistId)
+        const artArtists = filteredArtists
           .map(({ artistId }) => ({ art_id: Number(artId), artist_id: Number(artistId) }));
 
         await ArtProp.bulkCreate(artProperties, { returning: false, transaction });
