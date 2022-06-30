@@ -4,6 +4,7 @@ import { fileURLToPath } from 'url';
 import fs from 'fs/promises';
 import models from '../models/index.js';
 import sequelize from '../db/db.js';
+import resizeAndWriteFile from '../helpers/resize.js';
 import ApiError from '../errors/ApiError.js';
 import NotFoundError from '../errors/NotFoundError.js';
 
@@ -22,7 +23,7 @@ export default class ArtistController {
         const createParams = { ...req.body, user_id: userId, img: imgName };
         const { id } = await Artist.create(createParams, { returning: ['id'], transaction });
         if (req.file) {
-          await fs.writeFile(buildImgPath(imgName), req.file.buffer);
+          await resizeAndWriteFile(req.file.buffer, buildImgPath(imgName));
         }
 
         res.status(201).json({ id });
@@ -71,7 +72,7 @@ export default class ArtistController {
 
           await artist.update({ name, bio, img: newImgName }, { transaction });
           if (req.file) {
-            await fs.writeFile(buildImgPath(newImgName), req.file.buffer);
+            await resizeAndWriteFile(req.file.buffer, buildImgPath(newImgName));
           }
 
           res.status(204).end();

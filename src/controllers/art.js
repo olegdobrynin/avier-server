@@ -4,6 +4,7 @@ import { fileURLToPath } from 'url';
 import fs from 'fs/promises';
 import models from '../models/index.js';
 import sequelize from '../db/db.js';
+import resizeAndWriteFile from '../helpers/resize.js';
 import ApiError from '../errors/ApiError.js';
 import NotFoundError from '../errors/NotFoundError.js';
 
@@ -73,7 +74,7 @@ export default class ArtController {
 
           const promises = [mainImgName, ...extraImgNames]
             .map((imgName) => buildImgPath(imgName))
-            .map((imgPath, i) => fs.writeFile(imgPath, req.files[i].buffer));
+            .map((imgPath, i) => resizeAndWriteFile(req.files[i].buffer, imgPath));
 
           await Promise.all(promises);
         }
