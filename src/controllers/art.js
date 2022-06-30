@@ -24,11 +24,20 @@ export default class ArtController {
   static async create(req, res, next) {
     try {
       await sequelize.transaction(async (transaction) => {
-        const { typeId, artists = '[]', properties = '[]' } = req.body;
+        const {
+          name, typeId, year, city, about, artists = '[]', properties = '[]',
+        } = req.body;
         const mainImgName = req.files.length > 0 ? `${v4()}.jpg` : 'default.jpg';
 
         const { id: artId } = await Art.create(
-          { ...req.body, type_id: typeId, img: mainImgName },
+          {
+            name,
+            year: (Number(year) || null),
+            city: (city || null),
+            about: (about || null),
+            type_id: Number(typeId),
+            img: mainImgName,
+          },
           { returning: ['id'], transaction },
         );
 
