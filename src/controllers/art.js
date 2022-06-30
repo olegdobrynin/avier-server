@@ -37,6 +37,9 @@ export default class ArtController {
         if (!name || name.length < 5) {
           throw new Error('Введите название.');
         }
+        if (!/^\d{0,4}$/.test(year) || (Number(year) > new Date().getFullYear())) {
+          throw new Error('Введите правильный год.');
+        }
         const mainImgName = req.files.length > 0 ? `${v4()}.jpg` : 'default.jpg';
 
         const { id: artId } = await Art.create(
