@@ -1,21 +1,17 @@
-class FolderController {
-    
-    async create(req, res) {
+export default class FolderController {
+  static async create(req, res) {
 
-    }
+  }
 
-    async edit(req, res) {
+  static async edit(req, res) {
 
-    }
+  }
 
-    async getAll(req, res) {
+  static async getAll(req, res) {
 
-    }
-    
-    async delete(req, res) {
+  }
 
-    }
+  static async delete(req, res) {
 
+  }
 }
-
-module.exports = new FolderController()
