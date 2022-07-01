@@ -19,12 +19,12 @@ export default class UserController {
     try {
       const { login, password, role } = req.body;
       if (!login || !password) {
-        next(new ApiError({ message: 'Неккоректный логин или пароль' }, 404));
+        next(new ApiError({ message: 'Неккоректный логин или пароль' }, 400));
         return;
       }
       const candidate = await User.findOne({ where: { login: { [Op.iLike]: login } } });
       if (candidate) {
-        next(new ApiError({ message: 'Такой логин уже зарегистрирован' }, 404));
+        next(new ApiError({ message: 'Такой логин уже зарегистрирован' }, 400));
         return;
       }
       const hashPassword = await hash(password, 5);
@@ -39,7 +39,7 @@ export default class UserController {
         res.json({ token });
       });
     } catch (error) {
-      next(new ApiError(error, 500));
+      next(error);
     }
   }
 
@@ -48,19 +48,19 @@ export default class UserController {
       const { login, password } = req.body;
       const user = await User.findOne({ where: { login } });
       if (!user) {
-        next(new ApiError({ message: 'Пользователь не найден' }, 500));
+        next(new ApiError({ message: 'Пользователь не найден' }, 400));
         return;
       }
       const comparePassword = compareSync(password, user.password);
       if (!comparePassword) {
-        next(new ApiError({ message: 'Пароль не верный' }, 500));
+        next(new ApiError({ message: 'Пароль не верный' }, 400));
         return;
       }
       const token = generateJwt(user.id, user.login, user.role);
 
       res.json({ token });
     } catch (error) {
-      next(new ApiError(error, 500));
+      next(error);
     }
   }
 
@@ -71,7 +71,7 @@ export default class UserController {
 
       res.json({ token });
     } catch (error) {
-      next(new ApiError(error, 500));
+      next(error);
     }
   }
 
@@ -80,7 +80,7 @@ export default class UserController {
       const { id } = req.params;
       const user = await User.findByPk(id, {
         attributes: ['login'],
-        include: { model: Artist, as: 'artists', attributes: ['id', 'name', 'img'] },
+        include: Artist.getModel('id', 'name', 'img'),
       });
 
       if (user) {
@@ -89,7 +89,7 @@ export default class UserController {
         next(new NotFoundError());
       }
     } catch (error) {
-      next(new ApiError(error, 500));
+      next(error);
     }
   }
 }

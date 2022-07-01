@@ -7,6 +7,15 @@ export default (sequelize, DataTypes) => {
       this.belongsTo(User, { foreignKey: 'user_id' });
       this.belongsToMany(Art, { through: ArtArtist, foreignKey: 'artist_id', as: 'arts' });
     }
+
+    static getModel(...attributes) {
+      return {
+        model: Artist,
+        as: 'artists',
+        attributes,
+        through: { attributes: [] },
+      };
+    }
   }
 
   Artist.init({

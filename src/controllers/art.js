@@ -11,10 +11,6 @@ const {
   Art, ArtExtraImg, ArtProp, Artist, ArtArtist,
 } = models;
 
-const artistModel = {
-  model: Artist, as: 'artists', attributes: ['id', 'name'], through: { attributes: [] },
-};
-
 const __dirname = getDirname(import.meta.url);
 const buildImgPath = (imgName) => path.resolve(__dirname, '..', '..', 'static', 'arts', imgName);
 
@@ -101,7 +97,7 @@ export default class ArtController {
       if (artistId) {
         findParameters = {
           ...findParameters,
-          include: { ...artistModel, attributes: [], where: { id: Number(artistId) } },
+          include: { ...Artist.getModel(), where: { id: Number(artistId) } },
         };
       }
       if (typeId) {
@@ -119,7 +115,7 @@ export default class ArtController {
     try {
       const { id } = req.params;
       const art = await Art.findByPk(Number(id), {
-        include: [artistModel, ArtProp.model, ArtExtraImg.model],
+        include: [Artist.getModel('id', 'name'), ArtProp.model, ArtExtraImg.model],
         attributes: { exclude: ['id', 'type_id', 'created_at', 'updated_at'] },
       });
 
