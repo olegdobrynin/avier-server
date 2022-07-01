@@ -20,7 +20,7 @@ module.exports = {
       role: {
         type: Sequelize.STRING(5),
         allowNull: false,
-        defaultValue: 'USER',
+        defaultValue: 'user',
       },
       created_at: {
         type: Sequelize.DATE,

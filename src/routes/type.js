@@ -4,9 +4,9 @@ import checkRole from '../middlewares/checkRole.js';
 
 const router = new Router();
 
-router.delete('/:id(\\d+)', checkRole('ADMIN'), TypeController.delete);
+router.delete('/:id(\\d+)', checkRole('admin'), TypeController.delete);
 router.route('/')
   .get(TypeController.getAll)
-  .post(checkRole('ADMIN'), TypeController.create);
+  .post(checkRole('admin'), TypeController.create);
 
 export default router;
