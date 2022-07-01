@@ -20,13 +20,15 @@ export default class ArtistController {
         const { userId } = req.body;
         const imgName = req.file ? `${v4()}.jpg` : 'default.jpg';
 
-        const createParams = { ...req.body, user_id: userId, img: imgName };
-        const { id } = await Artist.create(createParams, { returning: ['id'], transaction });
+        const { id, name, img } = await Artist.create(
+          { ...req.body, user_id: userId, img: imgName },
+          { returning: ['id', 'name', 'img'], transaction },
+        );
         if (req.file) {
           await resizeAndWriteFile(req.file.buffer, buildImgPath(imgName));
         }
 
-        res.status(201).json({ id });
+        res.status(201).json({ id, name, img });
       });
     } catch (error) {
       next(new ApiError(error, 500));
