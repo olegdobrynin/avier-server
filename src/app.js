@@ -1,12 +1,12 @@
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import router from './routes/index.js';
+import getDirname from './helpers/dirname.js';
 import notFoundHandler from './middlewares/notFound.js';
 import errorHandler from './middlewares/errorHandling.js';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const __dirname = getDirname(import.meta.url);
 
 const app = express();
 

@@ -1,16 +1,16 @@
 import { v4 } from 'uuid';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import fs from 'fs/promises';
 import models from '../models/index.js';
 import sequelize from '../db/db.js';
+import getDirname from '../helpers/dirname.js';
 import resizeAndWriteFile from '../helpers/resize.js';
 import ApiError from '../errors/ApiError.js';
 import NotFoundError from '../errors/NotFoundError.js';
 
 const { Artist } = models;
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const __dirname = getDirname(import.meta.url);
 const buildImgPath = (imgName) => path.resolve(__dirname, '..', '..', 'static', 'artists', imgName);
 
 export default class ArtistController {

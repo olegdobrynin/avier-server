@@ -1,15 +1,13 @@
 import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
 import { DataTypes } from 'sequelize';
 import sequelize from '../db/db.js';
+import getDirname from '../helpers/dirname.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const { base: basename, dir: __dirname } = path.parse(__filename);
+const __dirname = getDirname(import.meta.url);
 
 const promises = fs
   .readdirSync(__dirname)
-  .filter((file) => !file.startsWith('.') && file !== basename && file.endsWith('.js'))
+  .filter((file) => !file.startsWith('.') && file !== 'index.js' && file.endsWith('.js'))
   .map((file) => import(`./${file}`));
 
 const modules = await Promise.all(promises);
