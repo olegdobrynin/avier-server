@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import path from 'path';
 import router from './routes/index.js';
-import getDirname from './helpers/dirname.js';
+import { getDirname } from './helpers/paths.js';
 import notFoundHandler from './middlewares/notFound.js';
 import errorHandler from './middlewares/errorHandling.js';
 

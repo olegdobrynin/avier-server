@@ -80,7 +80,7 @@ export default class UserController {
       const { id } = req.params;
       const user = await User.findByPk(id, {
         attributes: ['login'],
-        include: Artist.getModel('id', 'name', 'img'),
+        include: { ...Artist.getModel('id', 'name', 'img'), through: undefined },
       });
 
       if (user) {

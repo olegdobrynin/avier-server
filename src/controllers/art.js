@@ -1,18 +1,14 @@
 import { v4 } from 'uuid';
-import path from 'path';
 import fs from 'fs/promises';
 import models from '../models/index.js';
 import sequelize from '../db/db.js';
-import getDirname from '../helpers/dirname.js';
+import { buildImgPath } from '../helpers/paths.js';
 import resizeAndWriteFile from '../helpers/resize.js';
 import NotFoundError from '../errors/NotFoundError.js';
 
 const {
   Art, ArtExtraImg, ArtProp, Artist, ArtArtist,
 } = models;
-
-const __dirname = getDirname(import.meta.url);
-const buildImgPath = (imgName) => path.resolve(__dirname, '..', '..', 'static', 'arts', imgName);
 
 export default class ArtController {
   static async create(req, res, next) {
@@ -66,7 +62,7 @@ export default class ArtController {
           await ArtExtraImg.bulkCreate(extraImgs, { returning: false, transaction });
 
           const promises = [mainImgName, ...extraImgNames]
-            .map((imgName) => buildImgPath(imgName))
+            .map((imgName) => buildImgPath('arts', imgName))
             .map((imgPath, i) => resizeAndWriteFile(req.files[i].buffer, imgPath));
 
           await Promise.all(promises);
@@ -144,7 +140,7 @@ export default class ArtController {
           await art.destroy({ transaction });
           if (mainImgName !== 'default.jpg') {
             const promises = [{ img: mainImgName }, ...extraImgNames]
-              .map(({ img: imgName }) => fs.rm(buildImgPath(imgName)));
+              .map(({ img: imgName }) => fs.rm(buildImgPath('arts', imgName)));
             await Promise.all(promises);
           }
           res.json({ message: `Произведение '${name}' удалено.` });

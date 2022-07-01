@@ -1,17 +1,12 @@
 import { v4 } from 'uuid';
-import path from 'path';
 import fs from 'fs/promises';
 import models from '../models/index.js';
 import sequelize from '../db/db.js';
-import getDirname from '../helpers/dirname.js';
+import { buildImgPath } from '../helpers/paths.js';
 import resizeAndWriteFile from '../helpers/resize.js';
-import ApiError from '../errors/ApiError.js';
 import NotFoundError from '../errors/NotFoundError.js';
 
 const { Artist } = models;
-
-const __dirname = getDirname(import.meta.url);
-const buildImgPath = (imgName) => path.resolve(__dirname, '..', '..', 'static', 'artists', imgName);
 
 export default class ArtistController {
   static async create(req, res, next) {
@@ -25,13 +20,13 @@ export default class ArtistController {
           { returning: ['id', 'name', 'img'], transaction },
         );
         if (req.file) {
-          await resizeAndWriteFile(req.file.buffer, buildImgPath(imgName));
+          await resizeAndWriteFile(req.file.buffer, buildImgPath('artists', imgName));
         }
 
         res.status(201).json({ id, name, img });
       });
     } catch (error) {
-      next(new ApiError(error, 500));
+      next(error);
     }
   }
 
@@ -46,7 +41,7 @@ export default class ArtistController {
         next(new NotFoundError());
       }
     } catch (error) {
-      next(new ApiError(error, 500));
+      next(error);
     }
   }
 
@@ -56,7 +51,7 @@ export default class ArtistController {
 
       res.json(artists);
     } catch (error) {
-      next(new ApiError(error, 500));
+      next(error);
     }
   }
 
@@ -74,7 +69,7 @@ export default class ArtistController {
 
           await artist.update({ name, bio, img: newImgName }, { transaction });
           if (req.file) {
-            await resizeAndWriteFile(req.file.buffer, buildImgPath(newImgName));
+            await resizeAndWriteFile(req.file.buffer, buildImgPath('artists', newImgName));
           }
 
           res.status(204).end();
@@ -83,7 +78,7 @@ export default class ArtistController {
         }
       });
     } catch (error) {
-      next(new ApiError(error, 500));
+      next(error);
     }
   }
 
@@ -97,7 +92,7 @@ export default class ArtistController {
 
           await artist.destroy({ transaction });
           if (imgName !== 'default.jpg') {
-            await fs.rm(buildImgPath(imgName));
+            await fs.rm(buildImgPath('artists', imgName));
           }
           res.json({ message: `Художник '${name}' удалён.` });
         } else {
@@ -105,7 +100,7 @@ export default class ArtistController {
         }
       });
     } catch (error) {
-      next(new ApiError(error, 500));
+      next(error);
     }
   }
 }
