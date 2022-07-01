@@ -31,9 +31,15 @@ export default class MarkController {
   static async getAll(req, res, next) {
     try {
       const { id } = req.params;
+      const { limit = 8, page = 1 } = req.query;
+      const offset = (page - 1) * limit;
+
       const arts = await Art.findAndCountAll({
         attributes: ['id', 'name'],
         include: { model: MarkArt, where: { mark_id: id }, attributes: [] },
+        order: [['id', 'DESC']],
+        limit,
+        offset,
       });
 
       res.json(arts);
