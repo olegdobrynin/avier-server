@@ -5,6 +5,14 @@ export default (sequelize, DataTypes) => {
     static associate({ Art }) {
       this.belongsTo(Art, { foreignKey: 'art_id' });
     }
+
+    static get model() {
+      return {
+        model: ArtExtraImg,
+        as: 'extraImgs',
+        attributes: ['img'],
+      };
+    }
   }
 
   ArtExtraImg.init({

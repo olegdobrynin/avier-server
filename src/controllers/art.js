@@ -5,14 +5,12 @@ import models from '../models/index.js';
 import sequelize from '../db/db.js';
 import getDirname from '../helpers/dirname.js';
 import resizeAndWriteFile from '../helpers/resize.js';
-import ApiError from '../errors/ApiError.js';
 import NotFoundError from '../errors/NotFoundError.js';
 
 const {
   Art, ArtExtraImg, ArtProp, Artist, ArtArtist,
 } = models;
 
-const artExtraImgModel = { model: ArtExtraImg, as: 'extraImgs', attributes: ['img'] };
 const artPropModel = { model: ArtProp, as: 'properties', attributes: ['title', 'description'] };
 const artistModel = {
   model: Artist, as: 'artists', attributes: ['id', 'name'], through: { attributes: [] },
@@ -82,7 +80,7 @@ export default class ArtController {
         res.status(201).json({ id: artId });
       });
     } catch (error) {
-      next(new ApiError(error, 500));
+      next(error);
     }
   }
 
@@ -114,7 +112,7 @@ export default class ArtController {
 
       res.json(arts);
     } catch (error) {
-      next(new ApiError(error, 500));
+      next(error);
     }
   }
 
@@ -122,7 +120,7 @@ export default class ArtController {
     try {
       const { id } = req.params;
       const art = await Art.findByPk(Number(id), {
-        include: [artistModel, artPropModel, artExtraImgModel],
+        include: [artistModel, artPropModel, ArtExtraImg.model],
         attributes: { exclude: ['id', 'type_id', 'created_at', 'updated_at'] },
       });
 
@@ -133,7 +131,7 @@ export default class ArtController {
         next(new NotFoundError());
       }
     } catch (error) {
-      next(new ApiError(error, 500));
+      next(error);
     }
   }
 
@@ -160,7 +158,7 @@ export default class ArtController {
         }
       });
     } catch (error) {
-      next(new ApiError(error, 500));
+      next(error);
     }
   }
 }
