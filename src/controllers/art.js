@@ -11,7 +11,6 @@ const {
   Art, ArtExtraImg, ArtProp, Artist, ArtArtist,
 } = models;
 
-const artPropModel = { model: ArtProp, as: 'properties', attributes: ['title', 'description'] };
 const artistModel = {
   model: Artist, as: 'artists', attributes: ['id', 'name'], through: { attributes: [] },
 };
@@ -120,7 +119,7 @@ export default class ArtController {
     try {
       const { id } = req.params;
       const art = await Art.findByPk(Number(id), {
-        include: [artistModel, artPropModel, ArtExtraImg.model],
+        include: [artistModel, ArtProp.model, ArtExtraImg.model],
         attributes: { exclude: ['id', 'type_id', 'created_at', 'updated_at'] },
       });
 
