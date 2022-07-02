@@ -5,8 +5,9 @@ import authMiddleware from '../middlewares/auth.js';
 const router = new Router();
 
 router.get('/auth', authMiddleware, UserController.check);
-router.get('/info/:id(\\d+)', UserController.info);
 router.post('/registration', UserController.registration);
 router.post('/login', UserController.login);
+router.route('/:id(\\d+)')
+  .get(UserController.info);
 
 export default router;
