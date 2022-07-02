@@ -11,5 +11,5 @@ export default (err, _req, res, _next) => { // eslint-disable-line no-unused-var
     res.status(404).json({ message: 'Не найден' });
     return;
   }
-  res.status(500).json({ message: 'Непредвиденная ошибка!' });
+  res.status(500).json({ message });
 };
