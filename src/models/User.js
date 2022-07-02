@@ -24,7 +24,7 @@ export default (sequelize, DataTypes) => {
     role: {
       type: DataTypes.STRING(5),
       allowNull: false,
-      defaultValue: 'USER',
+      defaultValue: 'user',
     },
   }, {
     sequelize,
