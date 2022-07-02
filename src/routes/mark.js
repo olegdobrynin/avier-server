@@ -7,5 +7,7 @@ router.route('/:id(\\d+)')
   .get(MarkController.getAll)
   .post(MarkController.mark)
   .delete(MarkController.unMark);
+router.route('/')
+  .get(MarkController.getOne);
 
 export default router;

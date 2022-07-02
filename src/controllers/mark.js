@@ -1,5 +1,4 @@
 import models from '../models/index.js';
-import ApiError from '../errors/ApiError.js';
 
 const { Art, MarkArt } = models;
 
@@ -12,7 +11,7 @@ export default class MarkController {
 
       res.status(204).end();
     } catch (error) {
-      next(new ApiError(error, 500));
+      next(error);
     }
   }
 
@@ -24,7 +23,18 @@ export default class MarkController {
 
       res.status(204).end();
     } catch (error) {
-      next(new ApiError(error, 500));
+      next(error);
+    }
+  }
+
+  static async getOne(req, res, next) {
+    try {
+      const { artId, userId } = req.query;
+      const mark = await MarkArt.findOne({ where: { art_id: artId, mark_id: userId } });
+
+      res.json(Boolean(mark));
+    } catch (error) {
+      next(error);
     }
   }
 
@@ -44,7 +54,7 @@ export default class MarkController {
 
       res.json(arts);
     } catch (error) {
-      next(new ApiError(error, 500));
+      next(error);
     }
   }
 }
