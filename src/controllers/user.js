@@ -11,13 +11,13 @@ const { Artist, Mark, User } = models;
 const generateJwt = (id, login, role) => jwt.sign(
   { id, login, role },
   process.env.SECRET_KEY,
-  { expiresIn: '24h' },
+  { expiresIn: '15m' },
 );
 
 export default class UserController {
   static async registration(req, res, next) {
     try {
-      const { login, password, role } = req.body;
+      const { login, password } = req.body;
       if (!login || !password) {
         next(new ApiError({ message: 'Неккоректный логин или пароль' }, 400));
         return;
@@ -30,7 +30,7 @@ export default class UserController {
       const hashPassword = await hash(password, 5);
       await sequelize.transaction(async (transaction) => {
         const user = await User.create(
-          { login, role, password: hashPassword },
+          { login, password: hashPassword },
           { returning: ['id', 'login', 'role'], transaction },
         );
         await Mark.create({ user_id: user.id }, { returning: false, transaction });
