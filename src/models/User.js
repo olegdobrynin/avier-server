@@ -2,8 +2,12 @@ import { Model } from 'sequelize';
 
 export default (sequelize, DataTypes) => {
   class User extends Model {
-    static associate({ Artist }) {
+    static associate({ Artist, Mark, MarkArt }) {
+      this.hasOne(Mark, { foreignKey: 'user_id', hooks: true, onDelete: 'CASCADE' });
       this.hasMany(Artist, { foreignKey: 'user_id', as: 'artists' });
+      this.hasMany(MarkArt, {
+        foreignKey: 'mark_id', as: 'marks', hooks: true, onDelete: 'CASCADE',
+      });
     }
 
     toJSON() {
