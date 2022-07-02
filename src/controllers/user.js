@@ -92,4 +92,16 @@ export default class UserController {
       next(error);
     }
   }
+
+  static async delete(req, res, next) {
+    try {
+      const { id } = req.params;
+      const user = await User.findByPk(Number(id));
+      await user.destroy();
+
+      res.sendStatus(204);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
