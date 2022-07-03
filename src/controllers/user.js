@@ -19,12 +19,12 @@ export default class UserController {
     try {
       const { login, password } = req.body;
       if (!login || !password) {
-        next(new ApiError({ message: 'Неккоректный логин или пароль' }, 400));
+        next(new ApiError('Неккоректный логин или пароль', 400));
         return;
       }
       const candidate = await User.findOne({ where: { login: { [Op.iLike]: login } } });
       if (candidate) {
-        next(new ApiError({ message: 'Такой логин уже зарегистрирован' }, 400));
+        next(new ApiError('Такой логин уже зарегистрирован', 400));
         return;
       }
       const hashPassword = await hash(password, 5);
@@ -48,12 +48,12 @@ export default class UserController {
       const { login, password } = req.body;
       const user = await User.findOne({ where: { login } });
       if (!user) {
-        next(new ApiError({ message: 'Пользователь не найден' }, 400));
+        next(new ApiError('Пользователь не найден', 400));
         return;
       }
       const comparePassword = compareSync(password, user.password);
       if (!comparePassword) {
-        next(new ApiError({ message: 'Пароль не верный' }, 400));
+        next(new ApiError('Пароль не верный', 400));
         return;
       }
       const token = generateJwt(user.id, user.login, user.role);
