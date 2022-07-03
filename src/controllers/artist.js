@@ -63,12 +63,13 @@ export default class ArtistController {
         const artist = await Artist.findByPk(id, { returning: ['img'], transaction });
         if (artist) {
           const { img: oldImgName } = artist;
-          const newImgName = oldImgName === 'default.jpg' && req.file
+          const newImgName = req.file
             ? `${v4()}.jpg`
             : oldImgName;
 
           const data = await artist.update({ name, bio, img: newImgName }, { transaction });
           if (req.file) {
+            await fs.rm(buildImgPath('artists', oldImgName));
             await resizeAndWriteFile(req.file.buffer, buildImgPath('artists', newImgName));
           }
 
