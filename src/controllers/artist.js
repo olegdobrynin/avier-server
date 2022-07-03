@@ -67,12 +67,12 @@ export default class ArtistController {
             ? `${v4()}.jpg`
             : oldImgName;
 
-          await artist.update({ name, bio, img: newImgName }, { transaction });
+          const data = await artist.update({ name, bio, img: newImgName }, { transaction });
           if (req.file) {
             await resizeAndWriteFile(req.file.buffer, buildImgPath('artists', newImgName));
           }
 
-          res.status(204).end();
+          res.json({ name: data.name, bio: data.bio, img: data.img });
         } else {
           next(new NotFoundError());
         }
