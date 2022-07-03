@@ -8,7 +8,7 @@ import resizeAndWriteFile from '../helpers/resize.js';
 import ApiError from '../errors/ApiError.js';
 import NotFoundError from '../errors/NotFoundError.js';
 
-const { Artist } = models;
+const { Artist, User } = models;
 
 export default class ArtistController {
   static async create(req, res, next) {
@@ -66,15 +66,21 @@ export default class ArtistController {
     try {
       await sequelize.transaction(async (transaction) => {
         const { id } = req.params;
-        const { name, bio } = req.body;
+        const { name, bio, userLogin } = req.body;
         const artist = await Artist.findByPk(id, { returning: ['img'], transaction });
         if (artist) {
+          const user = await User.findOne({
+            where: { login: userLogin }, attributes: ['id'], transaction,
+          });
+          if (!user) {
+            throw new ApiError('Пользователь с таким логином не найден!', 400);
+          }
           const { img: oldImgName } = artist;
-          const newImgName = req.file
-            ? `${v4()}.jpg`
-            : oldImgName;
+          const newImgName = req.file ? `${v4()}.jpg` : oldImgName;
 
-          const data = await artist.update({ name, bio, img: newImgName }, { transaction });
+          const data = await artist.update({
+            name, bio, img: newImgName, user_id: user.id,
+          }, { transaction });
           if (req.file) {
             await fs.rm(buildImgPath('artists', oldImgName));
             await resizeAndWriteFile(req.file.buffer, buildImgPath('artists', newImgName));
