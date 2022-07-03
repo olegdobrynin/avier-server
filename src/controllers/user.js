@@ -1,6 +1,6 @@
 import { hash, compareSync } from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { Op } from 'sequelize';
+import { Op, ForeignKeyConstraintError } from 'sequelize';
 import models from '../models/index.js';
 import sequelize from '../db/db.js';
 import ApiError from '../errors/ApiError.js';
@@ -96,10 +96,13 @@ export default class UserController {
   static async delete(req, res, next) {
     try {
       const { id } = req.params;
-      const user = await User.findByPk(Number(id));
-      await user.destroy();
-
-      res.sendStatus(204);
+      await User.findByPk(Number(id))
+        .then((user) => user.destroy())
+        .then(() => res.sendStatus(204))
+        .catch((error) => (error instanceof ForeignKeyConstraintError
+          ? next(new ApiError('Невозможно удалить пользователя с художниками!', 400))
+          : next(error)
+        ));
     } catch (error) {
       next(error);
     }
