@@ -82,7 +82,9 @@ export default class ArtistController {
             name, bio, img: newImgName, user_id: user.id,
           }, { transaction });
           if (req.file) {
-            await fs.rm(buildImgPath('artists', oldImgName));
+            if (oldImgName !== 'default.jpg') {
+              await fs.rm(buildImgPath('artists', oldImgName));
+            }
             await resizeAndWriteFile(req.file.buffer, buildImgPath('artists', newImgName));
           }
 
