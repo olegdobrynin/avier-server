@@ -1,9 +1,11 @@
 import { v4 } from 'uuid';
 import fs from 'fs/promises';
+import { Op } from 'sequelize';
 import models from '../models/index.js';
 import sequelize from '../db/db.js';
 import { buildImgPath } from '../helpers/paths.js';
 import resizeAndWriteFile from '../helpers/resize.js';
+import ApiError from '../errors/ApiError.js';
 import NotFoundError from '../errors/NotFoundError.js';
 
 const { Artist } = models;
@@ -15,6 +17,11 @@ export default class ArtistController {
         const { userId } = req.body;
         const imgName = req.file ? `${v4()}.jpg` : 'default.jpg';
 
+        const artist = await Artist.findOne({ where: { name: { [Op.iLike]: req.body.name } } });
+        if (artist) {
+          next(new ApiError('Художник с таким именем уже существует.', 400));
+          return;
+        }
         const { id, name, img } = await Artist.create(
           { ...req.body, user_id: userId, img: imgName },
           { returning: ['id', 'name', 'img'], transaction },
