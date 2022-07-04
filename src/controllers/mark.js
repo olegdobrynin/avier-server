@@ -5,8 +5,7 @@ const { Art, MarkArt } = models;
 export default class MarkController {
   static async mark(req, res, next) {
     try {
-      const { id } = req.params;
-      const { artId } = req.body;
+      const { id, artId } = req.params;
       await MarkArt.create({ mark_id: id, art_id: artId });
 
       res.status(204).end();
@@ -17,8 +16,7 @@ export default class MarkController {
 
   static async unMark(req, res, next) {
     try {
-      const { id } = req.params;
-      const { artId } = req.body;
+      const { id, artId } = req.params;
       await MarkArt.destroy({ where: { mark_id: id, art_id: artId } });
 
       res.status(204).end();
@@ -29,8 +27,8 @@ export default class MarkController {
 
   static async getOne(req, res, next) {
     try {
-      const { artId, userId } = req.query;
-      const mark = await MarkArt.findOne({ where: { art_id: artId, mark_id: userId } });
+      const { id, artId } = req.params;
+      const mark = await MarkArt.findOne({ where: { art_id: artId, mark_id: id } });
 
       res.json(Boolean(mark));
     } catch (error) {
