@@ -8,7 +8,7 @@ export default class MarkController {
       const { id, artId } = req.params;
       await MarkArt.create({ mark_id: id, art_id: artId });
 
-      res.status(204).end();
+      res.sendStatus(204);
     } catch (error) {
       next(error);
     }
@@ -19,7 +19,7 @@ export default class MarkController {
       const { id, artId } = req.params;
       await MarkArt.destroy({ where: { mark_id: id, art_id: artId } });
 
-      res.status(204).end();
+      res.sendStatus(204);
     } catch (error) {
       next(error);
     }
@@ -44,7 +44,9 @@ export default class MarkController {
 
       const arts = await Art.findAndCountAll({
         attributes: ['id', 'img', 'name'],
-        include: { model: MarkArt, where: { mark_id: id }, attributes: [] },
+        include: {
+          model: MarkArt, as: 'mark', where: { mark_id: id }, attributes: [],
+        },
         order: [['id', 'DESC']],
         limit,
         offset,
