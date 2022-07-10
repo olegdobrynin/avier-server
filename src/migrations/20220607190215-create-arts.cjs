@@ -1,5 +1,3 @@
-'use strict';
-
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('arts', {
@@ -32,11 +30,6 @@ module.exports = {
         type: Sequelize.STRING(40),
         allowNull: false,
         defaultValue: 'default.jpg',
-      },
-      like: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        defaultValue: 0,
       },
       created_at: {
         type: Sequelize.DATE,

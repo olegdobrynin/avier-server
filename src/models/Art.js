@@ -54,11 +54,6 @@ export default (sequelize, DataTypes) => {
       allowNull: false,
       defaultValue: 'default.jpg',
     },
-    like: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      defaultValue: 0,
-    },
   }, {
     sequelize,
     createdAt: 'created_at',
