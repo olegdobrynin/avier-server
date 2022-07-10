@@ -52,9 +52,14 @@ export default class ArtistController {
     }
   }
 
-  static async getAll(_req, res, next) {
+  static async getAll(req, res, next) {
     try {
-      const artists = await Artist.findAll({ attributes: ['id', 'name', 'img'] });
+      const { userId } = req.query;
+      const artists = await Artist.findAll({
+        attributes: ['id', 'name', 'img'],
+        order: [['id', 'ASC']],
+        where: { user_id: userId },
+      });
 
       res.json(artists);
     } catch (error) {
