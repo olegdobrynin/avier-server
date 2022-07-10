@@ -4,9 +4,8 @@ import { Op, ForeignKeyConstraintError } from 'sequelize';
 import models from '../models/index.js';
 import sequelize from '../db/db.js';
 import ApiError from '../errors/ApiError.js';
-import NotFoundError from '../errors/NotFoundError.js';
 
-const { Artist, Mark, User } = models;
+const { Mark, User } = models;
 
 const generateJwt = (id, login, role) => jwt.sign(
   { id, login, role },
@@ -70,24 +69,6 @@ export default class UserController {
       const token = generateJwt(id, login, role);
 
       res.json({ token });
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  static async info(req, res, next) {
-    try {
-      const { id } = req.params;
-      const user = await User.findByPk(id, {
-        attributes: ['login'],
-        include: { ...Artist.getModel('id', 'name', 'img'), through: undefined },
-      });
-
-      if (user) {
-        res.json(user);
-      } else {
-        next(new NotFoundError());
-      }
     } catch (error) {
       next(error);
     }
