@@ -12,7 +12,9 @@ export default (sequelize, DataTypes) => {
       this.hasMany(ArtProp, {
         foreignKey: 'art_id', as: 'properties', hooks: true, onDelete: 'CASCADE',
       });
-      this.hasMany(MarkArt, { foreignKey: 'art_id', hooks: true, onDelete: 'CASCADE' });
+      this.hasMany(MarkArt, {
+        foreignKey: 'art_id', as: 'mark', hooks: true, onDelete: 'CASCADE',
+      });
       this.belongsTo(Type, { foreignKey: 'type_id', as: 'type' });
       this.belongsToMany(Artist, { through: ArtArtist, foreignKey: 'art_id', as: 'artists' });
       this.belongsToMany(Mark, { through: MarkArt, foreignKey: 'art_id', as: 'marks' });

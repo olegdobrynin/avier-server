@@ -43,7 +43,7 @@ export default class MarkController {
       const offset = (page - 1) * limit;
 
       const arts = await Art.findAndCountAll({
-        attributes: ['id', 'name'],
+        attributes: ['id', 'img', 'name'],
         include: { model: MarkArt, where: { mark_id: id }, attributes: [] },
         order: [['id', 'DESC']],
         limit,

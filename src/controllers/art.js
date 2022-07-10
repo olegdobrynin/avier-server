@@ -7,7 +7,7 @@ import resizeAndWriteFile from '../helpers/resize.js';
 import NotFoundError from '../errors/NotFoundError.js';
 
 const {
-  Art, ArtExtraImg, ArtProp, Artist, ArtArtist,
+  Art, ArtExtraImg, ArtProp, Artist, ArtArtist, MarkArt,
 } = models;
 
 export default class ArtController {
@@ -35,9 +35,9 @@ export default class ArtController {
         const { id: artId } = await Art.create(
           {
             name,
-            year: (Number(year) || null),
-            city: (city || null),
-            about: (about || null),
+            year: Number(year) || null,
+            city: city || null,
+            about: about || null,
             type_id: Number(typeId),
             img: mainImgName,
           },
@@ -78,13 +78,14 @@ export default class ArtController {
   static async getAll(req, res, next) {
     try {
       const {
-        artistId, typeId, limit = 8, page = 1,
+        artistId, typeId, userId, limit = 8, page = 1,
       } = req.query;
       const offset = (page - 1) * limit;
 
       let findParameters = {
         distinct: true,
         attributes: ['id', 'name', 'img'],
+        include: [],
         order: [['id', 'DESC']],
         limit,
         offset,
@@ -93,11 +94,26 @@ export default class ArtController {
       if (artistId) {
         findParameters = {
           ...findParameters,
-          include: { ...Artist.getModel(), where: { id: Number(artistId) } },
+          include: [{ ...Artist.getModel(), where: { id: Number(artistId) } }],
         };
       }
       if (typeId) {
         findParameters = { ...findParameters, where: { type_id: Number(typeId) } };
+      }
+      if (userId) {
+        findParameters = {
+          ...findParameters,
+          include: [
+            ...findParameters.include,
+            {
+              model: MarkArt,
+              as: 'mark',
+              attributes: [[sequelize.cast(sequelize.col('mark_id'), 'BOOL'), 'mark']],
+              required: false,
+              where: { mark_id: Number(userId) },
+            },
+          ],
+        };
       }
       const arts = await Art.findAndCountAll(findParameters);
 
