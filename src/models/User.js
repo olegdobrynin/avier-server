@@ -2,10 +2,15 @@ import { Model } from 'sequelize';
 
 export default (sequelize, DataTypes) => {
   class User extends Model {
-    static associate({ Artist, Mark, MarkArt }) {
+    static associate({
+      Artist, Mark, MarkArt, UserArtLike,
+    }) {
       this.hasMany(MarkArt, { foreignKey: 'mark_id', hooks: true, onDelete: 'CASCADE' });
       this.hasOne(Mark, { foreignKey: 'user_id', hooks: true, onDelete: 'CASCADE' });
       this.hasMany(Artist, { foreignKey: 'user_id', as: 'artists' });
+      this.hasMany(UserArtLike, {
+        foreignKey: 'user_id', as: 'likes', onDelete: 'CASCADE', hooks: true,
+      });
     }
 
     toJSON() {
