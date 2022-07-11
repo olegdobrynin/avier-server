@@ -8,7 +8,7 @@ import resizeAndWriteFile from '../helpers/resize.js';
 import NotFoundError from '../errors/NotFoundError.js';
 
 const {
-  Art, ArtExtraImg, ArtProp, Artist, ArtArtist, MarkArt,
+  Art, ArtExtraImg, ArtProp, Artist, ArtArtist, MarkArt, UserArtLike,
 } = models;
 
 export default class ArtController {
@@ -127,14 +127,34 @@ export default class ArtController {
   static async getOne(req, res, next) {
     try {
       const { id } = req.params;
+      const { userId } = req.query;
+      const extraModels = userId
+        ? [{
+          model: MarkArt,
+          as: 'mark',
+          attributes: [[sequelize.cast(sequelize.col('mark_id'), 'BOOL'), 'mark']],
+          required: false,
+          where: { mark_id: Number(userId) },
+        }, {
+          model: UserArtLike,
+          as: 'like',
+          attributes: [[sequelize.cast(sequelize.col('like.art_id'), 'BOOL'), 'like']],
+          required: false,
+          where: { user_id: Number(userId) },
+        }]
+        : [];
+
       const art = await Art.findByPk(Number(id), {
         attributes: { exclude: ['id', 'type_id', 'created_at', 'updated_at'] },
-        include: [Artist.getModel('id', 'name'), ArtProp.model, ArtExtraImg.model],
+        include: [Artist.getModel('id', 'name'), ArtProp.model, ArtExtraImg.model, ...extraModels],
         rejectOnEmpty: true,
-        raw: true,
       }).catch((err) => (err instanceof EmptyResultError
         ? next(new NotFoundError())
         : next(err)));
+
+      const likes = await UserArtLike.count({
+        where: { art_id: Number(id) }, col: ['user_id'], distinct: true,
+      });
 
       const { dataValues: { img: mainImg, extraImgs } } = art;
 
