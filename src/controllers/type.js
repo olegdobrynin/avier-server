@@ -1,5 +1,4 @@
 import models from '../models/index.js';
-import ApiError from '../errors/ApiError.js';
 
 const { Type } = models;
 
@@ -11,7 +10,7 @@ export default class TypeController {
 
       res.json(type);
     } catch (error) {
-      next(new ApiError(error, 500));
+      next(error);
     }
   }
 
@@ -21,7 +20,7 @@ export default class TypeController {
 
       res.json(types);
     } catch (error) {
-      next(new ApiError(error, 500));
+      next(error);
     }
   }
 
@@ -30,9 +29,9 @@ export default class TypeController {
       const { id } = req.params;
       await Type.destroy({ where: { id } });
 
-      res.json({ message: 'Тип удалён.' });
+      res.sendStatus(204);
     } catch (error) {
-      next(new ApiError(error, 500));
+      next(error);
     }
   }
 }
