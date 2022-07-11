@@ -1,5 +1,6 @@
 import { v4 } from 'uuid';
 import fs from 'fs/promises';
+import { EmptyResultError } from 'sequelize';
 import models from '../models/index.js';
 import sequelize from '../db/db.js';
 import { buildImgPath } from '../helpers/paths.js';
@@ -127,16 +128,17 @@ export default class ArtController {
     try {
       const { id } = req.params;
       const art = await Art.findByPk(Number(id), {
-        include: [Artist.getModel('id', 'name'), ArtProp.model, ArtExtraImg.model],
         attributes: { exclude: ['id', 'type_id', 'created_at', 'updated_at'] },
-      });
+        include: [Artist.getModel('id', 'name'), ArtProp.model, ArtExtraImg.model],
+        rejectOnEmpty: true,
+        raw: true,
+      }).catch((err) => (err instanceof EmptyResultError
+        ? next(new NotFoundError())
+        : next(err)));
 
-      if (art) {
-        const { dataValues: { img: mainImg, extraImgs } } = art;
-        res.json({ ...art.toJSON(), imgs: [mainImg, ...extraImgs.map(({ img }) => img)] });
-      } else {
-        next(new NotFoundError());
-      }
+      const { dataValues: { img: mainImg, extraImgs } } = art;
+
+      res.json({ ...art.toJSON(), imgs: [mainImg, ...extraImgs.map(({ img }) => img)], likes });
     } catch (error) {
       next(error);
     }
@@ -146,23 +148,25 @@ export default class ArtController {
     try {
       await sequelize.transaction(async (transaction) => {
         const { id } = req.params;
-        const art = await Art
-          .findByPk(Number(id), { attributes: ['id', 'name', 'img'], transaction });
-        if (art) {
-          const { name, img: mainImgName } = art;
-          const extraImgNames = await ArtExtraImg
-            .findAll({ where: { art_id: Number(id) }, attributes: ['img'], transaction });
+        const art = await Art.findByPk(Number(id), {
+          attributes: ['id', 'img'], rejectOnEmpy: true, transaction,
+        }).catch((err) => (err instanceof EmptyResultError
+          ? next(new NotFoundError())
+          : next(err)));
 
-          await art.destroy({ transaction });
-          if (mainImgName !== 'default.jpg') {
-            const promises = [{ img: mainImgName }, ...extraImgNames]
-              .map(({ img: imgName }) => fs.rm(buildImgPath('arts', imgName)));
-            await Promise.all(promises);
-          }
-          res.json({ message: `Произведение '${name}' удалено.` });
-        } else {
-          next(new NotFoundError());
+        const { img: mainImgName } = art;
+        const extraImgNames = await ArtExtraImg
+          .findAll({ where: { art_id: Number(id) }, attributes: ['img'], transaction });
+
+        await art.destroy({ transaction });
+        if (mainImgName !== 'default.jpg') {
+          const promises = [{ img: mainImgName }, ...extraImgNames].map(({ img: imgName }) => (
+            fs.rm(buildImgPath('arts', imgName))
+              .catch((err) => (err.code === 'ENOENT' ? null : next(err)))
+          ));
+          await Promise.all(promises);
         }
+        res.sendStatus(204);
       });
     } catch (error) {
       next(error);
