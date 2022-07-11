@@ -6,7 +6,6 @@ import sequelize from '../db/db.js';
 import { buildImgPath } from '../helpers/paths.js';
 import resizeAndWriteFile from '../helpers/resize.js';
 import ApiError from '../errors/ApiError.js';
-import NotFoundError from '../errors/NotFoundError.js';
 
 const { Artist, User } = models;
 
@@ -40,13 +39,11 @@ export default class ArtistController {
   static async getOne(req, res, next) {
     try {
       const { id } = req.params;
-      const artist = await Artist.findByPk(id, { attributes: ['name', 'bio', 'img'] });
+      const artist = await Artist.findByPk(Number(id), {
+        attributes: ['name', 'bio', 'img'], rejectOnEmpty: true,
+      });
 
-      if (artist) {
-        res.json(artist);
-      } else {
-        next(new NotFoundError());
-      }
+      res.json(artist);
     } catch (error) {
       next(error);
     }
@@ -72,31 +69,29 @@ export default class ArtistController {
       await sequelize.transaction(async (transaction) => {
         const { id } = req.params;
         const { name, bio, userLogin } = req.body;
-        const artist = await Artist.findByPk(id, { returning: ['img'], transaction });
-        if (artist) {
-          const user = await User.findOne({
-            where: { login: userLogin }, attributes: ['id'], transaction,
-          });
-          if (!user) {
-            throw new ApiError('Пользователь с таким логином не найден!', 400);
-          }
-          const { img: oldImgName } = artist;
-          const newImgName = req.file ? `${v4()}.jpg` : oldImgName;
-
-          const data = await artist.update({
-            name, bio, img: newImgName, user_id: user.id,
-          }, { transaction });
-          if (req.file) {
-            if (oldImgName !== 'default.jpg') {
-              await fs.rm(buildImgPath('artists', oldImgName));
-            }
-            await resizeAndWriteFile(req.file.buffer, buildImgPath('artists', newImgName));
-          }
-
-          res.json({ name: data.name, bio: data.bio, img: data.img });
-        } else {
-          next(new NotFoundError());
+        const artist = await Artist.findByPk(Number(id), {
+          returning: ['img'], rejectOnEmpty: true, transaction,
+        });
+        const user = await User.findOne({
+          where: { login: userLogin }, attributes: ['id'], transaction,
+        });
+        if (!user) {
+          throw new ApiError('Пользователь с таким логином не найден!', 400);
         }
+        const { img: oldImgName } = artist;
+        const newImgName = req.file ? `${v4()}.jpg` : oldImgName;
+
+        const data = await artist.update({
+          name, bio, img: newImgName, user_id: user.id,
+        }, { transaction });
+        if (req.file) {
+          if (oldImgName !== 'default.jpg') {
+            await fs.rm(buildImgPath('artists', oldImgName));
+          }
+          await resizeAndWriteFile(req.file.buffer, buildImgPath('artists', newImgName));
+        }
+
+        res.json({ name: data.name, bio: data.bio, img: data.img });
       });
     } catch (error) {
       next(error);
@@ -107,18 +102,16 @@ export default class ArtistController {
     try {
       await sequelize.transaction(async (transaction) => {
         const { id } = req.params;
-        const artist = await Artist.findByPk(id, { attributes: ['id', 'name', 'img'], transaction });
-        if (artist) {
-          const { name, img: imgName } = artist;
+        const artist = await Artist.findByPk(Number(id), {
+          attributes: ['id', 'name', 'img'], rejectOnEmpty: true, transaction,
+        });
+        const { name, img: imgName } = artist;
 
-          await artist.destroy({ transaction });
-          if (imgName !== 'default.jpg') {
-            await fs.rm(buildImgPath('artists', imgName));
-          }
-          res.json({ message: `Художник '${name}' удалён.` });
-        } else {
-          next(new NotFoundError());
+        await artist.destroy({ transaction });
+        if (imgName !== 'default.jpg') {
+          await fs.rm(buildImgPath('artists', imgName));
         }
+        res.json({ message: `Художник '${name}' удалён.` });
       });
     } catch (error) {
       next(error);

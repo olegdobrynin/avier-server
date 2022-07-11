@@ -1,11 +1,9 @@
 import { v4 } from 'uuid';
 import fs from 'fs/promises';
-import { EmptyResultError } from 'sequelize';
 import models from '../models/index.js';
 import sequelize from '../db/db.js';
 import { buildImgPath } from '../helpers/paths.js';
 import resizeAndWriteFile from '../helpers/resize.js';
-import NotFoundError from '../errors/NotFoundError.js';
 
 const {
   Art, ArtExtraImg, ArtProp, Artist, ArtArtist, MarkArt, UserArtLike,
@@ -155,9 +153,7 @@ export default class ArtController {
         attributes: { exclude: ['id', 'type_id', 'created_at', 'updated_at'] },
         include: [Artist.getModel('id', 'name'), ArtProp.model, ArtExtraImg.model, ...extraModels],
         rejectOnEmpty: true,
-      }).catch((err) => (err instanceof EmptyResultError
-        ? next(new NotFoundError())
-        : next(err)));
+      });
 
       const likes = await UserArtLike.count({
         where: { art_id: Number(id) }, col: ['user_id'], distinct: true,
@@ -176,10 +172,8 @@ export default class ArtController {
       await sequelize.transaction(async (transaction) => {
         const { id } = req.params;
         const art = await Art.findByPk(Number(id), {
-          attributes: ['id', 'img'], rejectOnEmpy: true, transaction,
-        }).catch((err) => (err instanceof EmptyResultError
-          ? next(new NotFoundError())
-          : next(err)));
+          attributes: ['id', 'img'], rejectOnEmpty: true, transaction,
+        });
 
         const { img: mainImgName } = art;
         const extraImgNames = await ArtExtraImg
