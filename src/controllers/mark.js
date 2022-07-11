@@ -6,7 +6,7 @@ export default class MarkController {
   static async mark(req, res, next) {
     try {
       const { id, artId } = req.params;
-      await MarkArt.create({ mark_id: id, art_id: artId });
+      await MarkArt.create({ mark_id: Number(id), art_id: Number(artId) });
 
       res.sendStatus(204);
     } catch (error) {
@@ -17,7 +17,7 @@ export default class MarkController {
   static async unMark(req, res, next) {
     try {
       const { id, artId } = req.params;
-      await MarkArt.destroy({ where: { mark_id: id, art_id: artId } });
+      await MarkArt.destroy({ where: { mark_id: Number(id), art_id: Number(artId) } });
 
       res.sendStatus(204);
     } catch (error) {
@@ -34,7 +34,7 @@ export default class MarkController {
       const arts = await Art.findAndCountAll({
         attributes: ['id', 'img', 'name'],
         include: {
-          model: MarkArt, as: 'mark', where: { mark_id: id }, attributes: [],
+          model: MarkArt, as: 'mark', where: { mark_id: Number(id) }, attributes: [],
         },
         order: [['id', 'DESC']],
         limit,
