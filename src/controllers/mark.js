@@ -25,17 +25,6 @@ export default class MarkController {
     }
   }
 
-  static async getOne(req, res, next) {
-    try {
-      const { id, artId } = req.params;
-      const mark = await MarkArt.findOne({ where: { art_id: artId, mark_id: id } });
-
-      res.json(Boolean(mark));
-    } catch (error) {
-      next(error);
-    }
-  }
-
   static async getAll(req, res, next) {
     try {
       const { id } = req.params;

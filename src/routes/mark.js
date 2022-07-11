@@ -6,7 +6,6 @@ const router = new Router();
 router.route('/:id(\\d+)')
   .get(MarkController.getAll);
 router.route('/:id(\\d+)/art/:artId(\\d+)')
-  .get(MarkController.getOne)
   .post(MarkController.mark)
   .delete(MarkController.unMark);
 
