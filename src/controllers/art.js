@@ -113,6 +113,13 @@ export default class ArtController {
               required: false,
               where: { mark_id: Number(userId) },
             },
+            {
+              model: UserArtLike,
+              as: 'like',
+              required: false,
+              where: { user_id: Number(userId) },
+              attributes: [[sequelize.cast(sequelize.col('like.user_id'), 'BOOL'), 'like']],
+            },
           ],
         };
       }
