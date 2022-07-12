@@ -1,6 +1,7 @@
+import sequelize from 'sequelize';
 import models from '../models/index.js';
 
-const { Art, MarkArt } = models;
+const { Art, MarkArt, UserArtLike } = models;
 
 export default class MarkController {
   static async mark(req, res, next) {
@@ -33,9 +34,21 @@ export default class MarkController {
 
       const arts = await Art.findAndCountAll({
         attributes: ['id', 'img', 'name'],
-        include: {
-          model: MarkArt, as: 'mark', where: { mark_id: Number(id) }, attributes: [],
-        },
+        include: [
+          {
+            model: MarkArt,
+            as: 'mark',
+            where: { mark_id: Number(id) },
+            attributes: [[sequelize.cast(sequelize.col('mark_id'), 'BOOL'), 'mark']],
+          },
+          {
+            model: UserArtLike,
+            as: 'like',
+            required: false,
+            where: { user_id: Number(id) },
+            attributes: [[sequelize.cast(sequelize.col('like.user_id'), 'BOOL'), 'like']],
+          },
+        ],
         order: [['id', 'DESC']],
         limit,
         offset,
