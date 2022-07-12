@@ -6,9 +6,9 @@ export default class TypeController {
   static async create(req, res, next) {
     try {
       const { name } = req.body;
-      const type = await Type.create({ name });
+      const { id } = await Type.create({ name });
 
-      res.json(type);
+      res.status(201).json({ id, name });
     } catch (error) {
       next(error);
     }
