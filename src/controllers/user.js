@@ -77,14 +77,18 @@ export default class UserController {
   static async delete(req, res, next) {
     try {
       const { id } = req.params;
-      await User.findByPk(Number(id))
-        .then((user) => user.destroy())
-        .then(() => res.sendStatus(204))
-        .catch((error) => (error instanceof ForeignKeyConstraintError
-          ? next(new ApiError('Невозможно удалить пользователя с художниками!', 400))
-          : next(error)
-        ));
+      const user = await User.findByPk(Number(id), { rejectOnEmpty: true });
+
+      await sequelize.transaction(async (transaction) => {
+        await user.destroy({ transaction });
+
+        res.sendStatus(204);
+      });
     } catch (error) {
+      if (error instanceof ForeignKeyConstraintError) {
+        next(new ApiError('Невозможно удалить пользователя с художниками!', 400));
+        return;
+      }
       next(error);
     }
   }
