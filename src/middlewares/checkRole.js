@@ -16,7 +16,6 @@ export default (role) => (req, res, next) => {
       res.status(403).json({ message: 'Нет доступа' });
       return;
     }
-    req.user = decoded;
     next();
   } catch (error) {
     next(error);

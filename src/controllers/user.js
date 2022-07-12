@@ -63,9 +63,9 @@ export default class UserController {
     }
   }
 
-  static async check(req, res, next) {
+  static async check(_req, res, next) {
     try {
-      const { id, login, role } = req.user;
+      const { id, login, role } = res.locals.user;
       const token = generateJwt(id, login, role);
 
       res.json({ token });

@@ -12,9 +12,13 @@ export default (req, res, next) => {
       return;
     }
     const decoded = jwt.verify(token, process.env.SECRET_KEY);
-    req.user = decoded;
+    res.locals.user = decoded;
     next();
   } catch (error) {
+    if (error instanceof jwt.TokenExpiredError) {
+      res.status(401).json({ message: 'Истек срок жизни токена.' });
+      return;
+    }
     next(error);
   }
 };
