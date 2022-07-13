@@ -1,7 +1,8 @@
 import sequelize from 'sequelize';
+import db from '../db/db.js';
 import models from '../models/index.js';
 
-const { Art, MarkArt, UserArtLike } = models;
+const { MarkArt } = models;
 
 export default class MarkController {
   static async mark(req, res, next) {
@@ -32,27 +33,16 @@ export default class MarkController {
       const { limit = 8, page = 1 } = req.query;
       const offset = (page - 1) * limit;
 
-      const arts = await Art.findAndCountAll({
-        attributes: ['id', 'img', 'name'],
-        include: [
-          {
-            model: MarkArt,
-            as: 'mark',
-            where: { mark_id: Number(id) },
-            attributes: [[sequelize.cast(sequelize.col('mark_id'), 'BOOL'), 'mark']],
-          },
-          {
-            model: UserArtLike,
-            as: 'like',
-            required: false,
-            where: { user_id: Number(id) },
-            attributes: [[sequelize.cast(sequelize.col('like.user_id'), 'BOOL'), 'like']],
-          },
-        ],
-        order: [['id', 'DESC']],
-        limit,
-        offset,
-      });
+      const arts = await db.query(
+        'SELECT id, name, img, COALESCE(mark, false) AS mark, COALESCE("like", false) AS "like", '
+      + 'COALESCE(likes::INTEGER, 0) AS likes FROM arts INNER JOIN (SELECT art_id, mark_id::BOOL '
+      + `AS mark FROM mark_arts WHERE mark_id = ${id}) AS marks ON id = marks.art_id LEFT JOIN `
+      + `(SELECT art_id, user_id::BOOL AS "like" FROM user_art_likes WHERE user_id = ${id}) `
+      + 'AS likes ON id = likes.art_id LEFT JOIN (SELECT art_id, COUNT(*) AS likes '
+      + 'FROM user_art_likes GROUP BY art_id) AS likesCount ON id = likesCount.art_id '
+      + `ORDER BY id DESC LIMIT ${limit} OFFSET ${offset};`,
+        { type: sequelize.QueryTypes.SELECT },
+      );
 
       res.json(arts);
     } catch (error) {
