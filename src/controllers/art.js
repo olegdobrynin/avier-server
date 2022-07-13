@@ -1,7 +1,8 @@
 import { v4 } from 'uuid';
 import fs from 'fs/promises';
+import sequelize from 'sequelize';
 import models from '../models/index.js';
-import sequelize from '../db/db.js';
+import db from '../db/db.js';
 import { buildImgPath } from '../helpers/paths.js';
 import resizeAndWriteFile from '../helpers/resize.js';
 
@@ -12,7 +13,7 @@ const {
 export default class ArtController {
   static async create(req, res, next) {
     try {
-      await sequelize.transaction(async (transaction) => {
+      await db.transaction(async (transaction) => {
         const {
           name, typeId, year, city, about, artists = '[]', properties = '[]',
         } = req.body;
@@ -81,47 +82,23 @@ export default class ArtController {
       } = req.query;
       const offset = (page - 1) * limit;
 
-      let findParameters = {
-        distinct: true,
-        attributes: ['id', 'name', 'img'],
-        include: [],
-        order: [['id', 'DESC']],
-        limit,
-        offset,
-      };
-
-      if (artistId) {
-        findParameters = {
-          ...findParameters,
-          include: [{ ...Artist.getModel(), where: { id: Number(artistId) } }],
-        };
-      }
-      if (typeId) {
-        findParameters = { ...findParameters, where: { type_id: Number(typeId) } };
-      }
-      if (userId) {
-        findParameters = {
-          ...findParameters,
-          include: [
-            ...findParameters.include,
-            {
-              model: MarkArt,
-              as: 'mark',
-              attributes: [[sequelize.cast(sequelize.col('mark_id'), 'BOOL'), 'mark']],
-              required: false,
-              where: { mark_id: Number(userId) },
-            },
-            {
-              model: UserArtLike,
-              as: 'like',
-              required: false,
-              where: { user_id: Number(userId) },
-              attributes: [[sequelize.cast(sequelize.col('like.user_id'), 'BOOL'), 'like']],
-            },
-          ],
-        };
-      }
-      const arts = await Art.findAndCountAll(findParameters);
+      const arts = await db.query(
+        'SELECT id, name, img, COALESCE(likes::INTEGER, 0) AS likes'
+      + `${userId ? ', COALESCE(mark, false) AS mark, COALESCE("like", false) AS "like" ' : ' '}`
+      + 'FROM arts LEFT JOIN (SELECT art_id, COUNT(*) AS likes FROM user_art_likes GROUP BY art_id) '
+      + 'AS likesCount ON id = likesCount.art_id '
+      + `${userId
+        ? `LEFT JOIN (SELECT art_id, mark_id::BOOL AS mark FROM mark_arts WHERE mark_id = ${userId}) `
+      + 'AS marks ON id = marks.art_id LEFT JOIN (SELECT art_id, user_id::BOOL AS "like" '
+      + `FROM user_art_likes WHERE user_id = ${userId}) AS likes ON id = likes.art_id `
+        : ''}`
+      + `${artistId
+        ? `INNER JOIN (SELECT art_id, artist_id FROM art_artists WHERE artist_id = ${artistId}) `
+      + 'AS artists ON id = artists.art_id '
+        : ''}`
+      + `${typeId ? `WHERE type_id = ${typeId} ` : ''}ORDER BY id DESC LIMIT ${limit} OFFSET ${offset};`,
+        { type: sequelize.QueryTypes.SELECT },
+      );
 
       res.json(arts);
     } catch (error) {
@@ -169,7 +146,7 @@ export default class ArtController {
 
   static async delete(req, res, next) {
     try {
-      await sequelize.transaction(async (transaction) => {
+      await db.transaction(async (transaction) => {
         const { id } = req.params;
         const art = await Art.findByPk(Number(id), {
           attributes: ['id', 'img'], rejectOnEmpty: true, transaction,
