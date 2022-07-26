@@ -7,7 +7,8 @@ const { MarkArt } = models;
 export default class MarkController {
   static async mark(req, res, next) {
     try {
-      const { id, artId } = req.params;
+      const { id } = res.locals.user;
+      const { artId } = req.params;
       await MarkArt.create({ mark_id: Number(id), art_id: Number(artId) });
 
       res.sendStatus(204);
@@ -18,7 +19,8 @@ export default class MarkController {
 
   static async unMark(req, res, next) {
     try {
-      const { id, artId } = req.params;
+      const { id } = res.locals.user;
+      const { artId } = req.params;
       await MarkArt.destroy({ where: { mark_id: Number(id), art_id: Number(artId) } });
 
       res.sendStatus(204);
@@ -29,7 +31,7 @@ export default class MarkController {
 
   static async getAll(req, res, next) {
     try {
-      const { id } = req.params;
+      const { id } = res.locals.user;
       const { limit = 8, page = 1 } = req.query;
       const offset = (page - 1) * limit;
 

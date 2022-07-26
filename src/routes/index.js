@@ -12,7 +12,7 @@ const router = new Router();
 router.use('/art', artRouter);
 router.use('/artist', artistRouter);
 router.use('/like', authorization, likeRouter);
-router.use('/mark', markRouter);
+router.use('/mark', authorization, markRouter);
 router.use('/type', typeRouter);
 router.use('/user', userRouter);
 

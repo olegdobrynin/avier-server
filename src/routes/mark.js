@@ -3,9 +3,8 @@ import MarkController from '../controllers/mark.js';
 
 const router = new Router();
 
-router.route('/:id(\\d+)')
-  .get(MarkController.getAll);
-router.route('/:id(\\d+)/art/:artId(\\d+)')
+router.get('/', MarkController.getAll);
+router.route('/:artId(\\d+)')
   .post(MarkController.mark)
   .delete(MarkController.unMark);
 
