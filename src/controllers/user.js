@@ -10,7 +10,7 @@ const { Mark, User } = models;
 const generateJwt = (id, login, role) => jwt.sign(
   { id, login, role },
   process.env.SECRET_KEY,
-  { expiresIn: '15m' },
+  { expiresIn: '7d' },
 );
 
 export default class UserController {
