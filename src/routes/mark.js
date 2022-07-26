@@ -1,4 +1,4 @@
-import Router from 'express';
+import { Router } from 'express';
 import MarkController from '../controllers/mark.js';
 
 const router = new Router();

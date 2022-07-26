@@ -1,4 +1,4 @@
-import Router from 'express';
+import { Router } from 'express';
 import artRouter from './art.js';
 import artistRouter from './artist.js';
 import likeRouter from './like.js';
