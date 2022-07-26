@@ -3,9 +3,8 @@ import LikeController from '../controllers/like.js';
 
 const router = new Router();
 
-router.route('/:id(\\d+)')
-  .get(LikeController.getAll);
-router.route('/:id(\\d+)/art/:artId(\\d+)')
+router.get('/', LikeController.getAll);
+router.route('/:artId(\\d+)')
   .post(LikeController.like)
   .delete(LikeController.unLike);
 

@@ -5,12 +5,13 @@ import likeRouter from './like.js';
 import markRouter from './mark.js';
 import typeRouter from './type.js';
 import userRouter from './user.js';
+import authorization from '../middlewares/authorization.js';
 
 const router = new Router();
 
 router.use('/art', artRouter);
 router.use('/artist', artistRouter);
-router.use('/like', likeRouter);
+router.use('/like', authorization, likeRouter);
 router.use('/mark', markRouter);
 router.use('/type', typeRouter);
 router.use('/user', userRouter);
