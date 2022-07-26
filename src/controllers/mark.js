@@ -32,8 +32,7 @@ export default class MarkController {
   static async getAll(req, res, next) {
     try {
       const { id } = res.locals.user;
-      const { limit = 8, page = 1 } = req.query;
-      const offset = (page - 1) * limit;
+      const { artId, limit = 8 } = req.query;
 
       const arts = await db.query(
         'SELECT id, name, img, COALESCE(mark, false) AS mark, COALESCE("like", false) AS "like", '
@@ -42,7 +41,7 @@ export default class MarkController {
       + `(SELECT art_id, user_id::BOOL AS "like" FROM user_art_likes WHERE user_id = ${id}) `
       + 'AS likes ON id = likes.art_id LEFT JOIN (SELECT art_id, COUNT(*) AS likes '
       + 'FROM user_art_likes GROUP BY art_id) AS likesCount ON id = likesCount.art_id '
-      + `ORDER BY id DESC LIMIT ${limit} OFFSET ${offset};`,
+      + `${artId ? `WHERE id < ${artId}` : ''} ORDER BY id DESC LIMIT ${limit};`,
         { type: sequelize.QueryTypes.SELECT },
       );
 
