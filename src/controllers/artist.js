@@ -13,7 +13,7 @@ export default class ArtistController {
   static async create(req, res, next) {
     try {
       await sequelize.transaction(async (transaction) => {
-        const { userId } = req.body;
+        const { id: userId } = res.locals.user;
         const imgName = req.file ? `${v4()}.jpg` : 'default.jpg';
 
         const artist = await Artist.findOne({ where: { name: { [Op.iLike]: req.body.name } } });
@@ -22,7 +22,7 @@ export default class ArtistController {
           return;
         }
         const { id, name, img } = await Artist.create(
-          { ...req.body, user_id: userId, img: imgName },
+          { ...req.body, user_id: Number(userId), img: imgName },
           { returning: ['id', 'name', 'img'], transaction },
         );
         if (req.file) {
@@ -49,13 +49,13 @@ export default class ArtistController {
     }
   }
 
-  static async getAll(req, res, next) {
+  static async getAll(_req, res, next) {
     try {
-      const { userId } = req.query;
+      const { id: userId } = res.locals.user;
       const artists = await Artist.findAll({
         attributes: ['id', 'name', 'img'],
         order: [['id', 'ASC']],
-        where: { user_id: userId },
+        where: { user_id: Number(userId) },
       });
 
       res.json(artists);
@@ -67,10 +67,15 @@ export default class ArtistController {
   static async update(req, res, next) {
     try {
       await sequelize.transaction(async (transaction) => {
+        const { id: userId } = res.locals.user;
         const { id } = req.params;
         const { name, bio, userLogin } = req.body;
-        const artist = await Artist.findByPk(Number(id), {
-          returning: ['img'], rejectOnEmpty: true, transaction,
+
+        const artist = await Artist.findOne({
+          where: { id: Number(id), user_id: Number(userId) },
+          returning: ['img'],
+          rejectOnEmpty: true,
+          transaction,
         });
         const user = await User.findOne({
           where: { login: userLogin }, attributes: ['id'], transaction,
@@ -101,9 +106,14 @@ export default class ArtistController {
   static async delete(req, res, next) {
     try {
       await sequelize.transaction(async (transaction) => {
+        const { id: userId } = res.locals.user;
         const { id } = req.params;
-        const artist = await Artist.findByPk(Number(id), {
-          attributes: ['id', 'name', 'img'], rejectOnEmpty: true, transaction,
+
+        const artist = await Artist.findOne({
+          where: { id: Number(id), user_id: Number(userId) },
+          attributes: ['id', 'name', 'img'],
+          rejectOnEmpty: true,
+          transaction,
         });
         const { name, img: imgName } = artist;
 
