@@ -15,7 +15,9 @@ export default (sequelize, DataTypes) => {
     }
 
     toJSON() {
-      return { ...this.get(), password: undefined };
+      return {
+        ...this.get(), password: undefined, created_at: undefined, updated_at: undefined,
+      };
     }
   }
 
