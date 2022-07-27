@@ -1,5 +1,6 @@
 import { v4 } from 'uuid';
 import fs from 'fs/promises';
+import jwt from 'jsonwebtoken';
 import sequelize from 'sequelize';
 import models from '../models/index.js';
 import db from '../db/db.js';
@@ -77,20 +78,23 @@ export default class ArtController {
 
   static async getAll(req, res, next) {
     try {
+      const user = req.headers.authorization
+        ? jwt.verify(req.headers.authorization.split(' ').at(1), process.env.SECRET_KEY)
+        : { id: null };
       const {
-        artistId, typeId, userId, limit = 8, page = 1,
+        artistId, typeId, limit = 8, page = 1,
       } = req.query;
       const offset = (page - 1) * limit;
 
       const arts = await db.query(
         'SELECT id, name, img, COALESCE(likes::INTEGER, 0) AS likes'
-      + `${userId ? ', COALESCE(mark, false) AS mark, COALESCE("like", false) AS "like" ' : ' '}`
+      + `${user.id ? ', COALESCE(mark, false) AS mark, COALESCE("like", false) AS "like" ' : ' '}`
       + 'FROM arts LEFT JOIN (SELECT art_id, COUNT(*) AS likes FROM user_art_likes GROUP BY art_id) '
       + 'AS likesCount ON id = likesCount.art_id '
-      + `${userId
-        ? `LEFT JOIN (SELECT art_id, mark_id::BOOL AS mark FROM mark_arts WHERE mark_id = ${userId}) `
+      + `${user.id
+        ? `LEFT JOIN (SELECT art_id, mark_id::BOOL AS mark FROM mark_arts WHERE mark_id = ${user.id}) `
       + 'AS marks ON id = marks.art_id LEFT JOIN (SELECT art_id, user_id::BOOL AS "like" '
-      + `FROM user_art_likes WHERE user_id = ${userId}) AS likes ON id = likes.art_id `
+      + `FROM user_art_likes WHERE user_id = ${user.id}) AS likes ON id = likes.art_id `
         : ''}`
       + `${artistId
         ? `INNER JOIN (SELECT art_id, artist_id FROM art_artists WHERE artist_id = ${artistId}) `
@@ -108,21 +112,23 @@ export default class ArtController {
 
   static async getOne(req, res, next) {
     try {
+      const user = req.headers.authorization
+        ? jwt.verify(req.headers.authorization.split(' ').at(1), process.env.SECRET_KEY)
+        : { id: null };
       const { id } = req.params;
-      const { userId } = req.query;
-      const extraModels = userId
+      const extraModels = user.id
         ? [{
           model: MarkArt,
           as: 'mark',
           attributes: [[sequelize.cast(sequelize.col('mark_id'), 'BOOL'), 'mark']],
           required: false,
-          where: { mark_id: Number(userId) },
+          where: { mark_id: Number(user.id) },
         }, {
           model: UserArtLike,
           as: 'like',
           attributes: [[sequelize.cast(sequelize.col('like.art_id'), 'BOOL'), 'like']],
           required: false,
-          where: { user_id: Number(userId) },
+          where: { user_id: Number(user.id) },
         }]
         : [];
 
