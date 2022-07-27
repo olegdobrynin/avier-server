@@ -1,5 +1,3 @@
-'use strict';
-
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('art_artists', {
@@ -17,10 +15,10 @@ module.exports = {
           model: 'artists',
         },
       },
-   });
+    });
   },
 
   async down(queryInterface) {
     await queryInterface.dropTable('art_artists');
-  }
+  },
 };
