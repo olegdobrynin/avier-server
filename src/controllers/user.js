@@ -39,7 +39,7 @@ export default class UserController {
         await Mark.create({ user_id: user.id }, { returning: false, transaction });
 
         const token = generateJwt(user.id, user.login, user.role);
-        res.json({ token });
+        res.json({ user, token });
       });
     } catch (error) {
       next(error);
@@ -61,7 +61,7 @@ export default class UserController {
       }
       const token = generateJwt(user.id, user.login, user.role);
 
-      res.json({ token });
+      res.json({ user, token });
     } catch (error) {
       next(error);
     }
@@ -72,7 +72,7 @@ export default class UserController {
       const { id, login, role } = res.locals.user;
       const token = generateJwt(id, login, role);
 
-      res.json({ token });
+      res.json({ user: { id, login, role }, token });
     } catch (error) {
       next(error);
     }
