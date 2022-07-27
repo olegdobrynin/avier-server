@@ -153,9 +153,14 @@ export default class ArtController {
   static async delete(req, res, next) {
     try {
       await db.transaction(async (transaction) => {
+        const { id: userId } = res.locals.user;
         const { id } = req.params;
-        const art = await Art.findByPk(Number(id), {
-          attributes: ['id', 'img'], rejectOnEmpty: true, transaction,
+        const art = await Art.findOne({
+          where: { id },
+          attributes: ['id', 'img'],
+          include: { model: Artist, as: 'artists', where: { user_id: userId } },
+          rejectOnEmpty: true,
+          transaction,
         });
 
         const { img: mainImgName } = art;
