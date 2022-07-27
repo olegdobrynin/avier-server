@@ -80,7 +80,12 @@ export default class UserController {
 
   static async delete(req, res, next) {
     try {
+      const { id: userId } = res.locals.user;
       const { id } = req.params;
+      if (id !== userId) {
+        res.sendStatus(403);
+        return;
+      }
       const user = await User.findByPk(Number(id), { rejectOnEmpty: true });
 
       await sequelize.transaction(async (transaction) => {
