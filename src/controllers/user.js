@@ -17,13 +17,17 @@ export default class UserController {
   static async registration(req, res, next) {
     try {
       const { login, password } = req.body;
-      if (!login || !password) {
-        next(new ApiError('Неккоректный логин или пароль', 400));
+      if (!login) {
+        next(new ApiError('Введите логин', 400));
         return;
       }
       const candidate = await User.findOne({ where: { login: { [Op.iLike]: login } } });
       if (candidate) {
         next(new ApiError('Такой логин уже зарегистрирован', 400));
+        return;
+      }
+      if (password.length < 8) {
+        next(new ApiError('Введите пароль длиннее 8 символов', 400));
         return;
       }
       const hashPassword = await hash(password, 5);
