@@ -78,8 +78,9 @@ export default class ArtController {
 
   static async getAll(req, res, next) {
     try {
-      const user = req.headers.authorization
-        ? jwt.verify(req.headers.authorization.split(' ').at(1), process.env.SECRET_KEY)
+      const token = req.headers.authorization.split(' ').at(1);
+      const user = token !== 'null'
+        ? jwt.verify(token, process.env.SECRET_KEY)
         : { id: null };
       const {
         artistId, typeId, limit = 8, page = 1,
@@ -112,8 +113,9 @@ export default class ArtController {
 
   static async getOne(req, res, next) {
     try {
-      const user = req.headers.authorization
-        ? jwt.verify(req.headers.authorization.split(' ').at(1), process.env.SECRET_KEY)
+      const token = req.headers.authorization.split(' ').at(1);
+      const user = token !== 'null'
+        ? jwt.verify(token, process.env.SECRET_KEY)
         : { id: null };
       const { id } = req.params;
       const extraModels = user.id
