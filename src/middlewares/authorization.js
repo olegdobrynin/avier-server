@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 
-export default (req, res, next) => {
+export default (...roles) => (req, res, next) => {
   try {
     if (!req.headers.authorization) {
       res.sendStatus(401);
@@ -11,8 +11,13 @@ export default (req, res, next) => {
       res.status(400).json({ message: 'Авторизационный метод неподдерживается' });
       return;
     }
-    res.locals.user = jwt.verify(token, process.env.SECRET_KEY);
-    next();
+    const { id, role } = jwt.verify(token, process.env.SECRET_KEY);
+    if (roles.includes(role)) {
+      res.locals.user = { id, role };
+      next();
+    } else {
+      res.sendStatus(403);
+    }
   } catch ({ name, message }) {
     switch (name) {
       case 'TokenExpiredError':

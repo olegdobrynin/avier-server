@@ -4,10 +4,10 @@ import authorization from '../middlewares/authorization.js';
 
 const router = new Router();
 
-router.get('/auth', authorization, UserController.check);
+router.get('/auth', authorization('admin', 'artist', 'user'), UserController.check);
 router.post('/registration', express.json(), UserController.registration);
 router.post('/login', express.json(), UserController.login);
-router.route('/:id(\\d+)')
+router.use(authorization('admin', 'artist', 'user')).route('/:id(\\d+)')
   .delete(UserController.delete);
 
 export default router;
