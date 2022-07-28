@@ -92,7 +92,7 @@ export default class UserController {
     try {
       const { id: userId, role } = res.locals.user;
       const { id } = req.params;
-      if (id !== userId && role !== 'admin') {
+      if (Number(id) !== userId && role !== 'admin') {
         res.sendStatus(403);
         return;
       }
