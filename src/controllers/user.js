@@ -78,6 +78,16 @@ export default class UserController {
     }
   }
 
+  static async changeRole(req, res, next) {
+    try {
+      const { login, role } = req.body;
+      await User.update({ role }, { where: { login }, fields: ['role'] });
+      res.sendStatus(204);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   static async delete(req, res, next) {
     try {
       const { id: userId } = res.locals.user;
