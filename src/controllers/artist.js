@@ -67,15 +67,15 @@ export default class ArtistController {
   static async update(req, res, next) {
     try {
       await sequelize.transaction(async (transaction) => {
-        const { id: userId } = res.locals.user;
+        const { id: userId, role } = res.locals.user;
         const { id } = req.params;
         const { name, bio, userLogin } = req.body;
+        const where = role === 'admin'
+          ? { id: Number(id) }
+          : { id: Number(id), user_id: Number(userId) };
 
         const artist = await Artist.findOne({
-          where: { id: Number(id), user_id: Number(userId) },
-          returning: ['img'],
-          rejectOnEmpty: true,
-          transaction,
+          where, returning: ['img'], rejectOnEmpty: true, transaction,
         });
         const user = await User.findOne({
           where: { login: userLogin }, attributes: ['id'], transaction,
@@ -106,22 +106,22 @@ export default class ArtistController {
   static async delete(req, res, next) {
     try {
       await sequelize.transaction(async (transaction) => {
-        const { id: userId } = res.locals.user;
+        const { id: userId, role } = res.locals.user;
         const { id } = req.params;
+        const where = role === 'admin'
+          ? { id: Number(id) }
+          : { id: Number(id), user_id: Number(userId) };
 
         const artist = await Artist.findOne({
-          where: { id: Number(id), user_id: Number(userId) },
-          attributes: ['id', 'name', 'img'],
-          rejectOnEmpty: true,
-          transaction,
+          where, attributes: ['id', 'img'], rejectOnEmpty: true, transaction,
         });
-        const { name, img: imgName } = artist;
+        const { img: imgName } = artist;
 
         await artist.destroy({ transaction });
         if (imgName !== 'default.jpg') {
           await fs.rm(buildImgPath('artists', imgName));
         }
-        res.json({ message: `Художник '${name}' удалён.` });
+        res.sendStatus(204);
       });
     } catch (error) {
       next(error);

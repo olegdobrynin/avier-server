@@ -90,9 +90,9 @@ export default class UserController {
 
   static async delete(req, res, next) {
     try {
-      const { id: userId } = res.locals.user;
+      const { id: userId, role } = res.locals.user;
       const { id } = req.params;
-      if (id !== userId) {
+      if (id !== userId && role !== 'admin') {
         res.sendStatus(403);
         return;
       }
