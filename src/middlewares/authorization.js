@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 
-export default (...roles) => (req, res, next) => {
+export default (level) => (req, res, next) => {
   try {
     if (!req.headers.authorization) {
       res.sendStatus(401);
@@ -12,12 +12,25 @@ export default (...roles) => (req, res, next) => {
       return;
     }
     const { id, login, role } = jwt.verify(token, process.env.SECRET_KEY);
-    if (roles.includes(role)) {
-      res.locals.user = { id, login, role };
-      next();
-    } else {
-      res.sendStatus(403);
+    res.locals.user = { id, login, role };
+    switch (level) {
+      case 1:
+        if (role === 'admin') {
+          next();
+          return;
+        }
+        break;
+      case 2:
+        if (['admin', 'artist'].includes(role)) {
+          next();
+          return;
+        }
+        break;
+      default:
+        next();
+        return;
     }
+    res.sendStatus(403);
   } catch ({ name, message }) {
     switch (name) {
       case 'TokenExpiredError':

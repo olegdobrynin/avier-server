@@ -4,9 +4,9 @@ import authorization from '../middlewares/authorization.js';
 
 const router = new Router();
 
-router.delete('/:id(\\d+)', authorization('admin'), TypeController.delete);
+router.delete('/:id(\\d+)', authorization(1), TypeController.delete);
 router.route('/')
   .get(TypeController.getAll)
-  .post(authorization('admin'), express.json(), TypeController.create);
+  .post(authorization(1), express.json(), TypeController.create);
 
 export default router;

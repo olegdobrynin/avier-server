@@ -11,8 +11,8 @@ const router = new Router();
 
 router.use('/art', artRouter);
 router.use('/artist', artistRouter);
-router.use('/like', authorization('admin', 'artist', 'user'), likeRouter);
-router.use('/mark', authorization('admin', 'artist', 'user'), markRouter);
+router.use('/like', authorization(), likeRouter);
+router.use('/mark', authorization(), markRouter);
 router.use('/type', typeRouter);
 router.use('/user', userRouter);
 

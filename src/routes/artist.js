@@ -9,10 +9,10 @@ const upload = multer({ fileFilter, limits: { ...defaultLimits, fields: 3, files
 
 router.route('/:id(\\d+)')
   .get(ArtistController.getOne)
-  .patch(authorization('admin', 'artist'), upload.single('img'), ArtistController.update)
-  .delete(authorization('admin', 'artist'), ArtistController.delete);
+  .patch(authorization(2), upload.single('img'), ArtistController.update)
+  .delete(authorization(2), ArtistController.delete);
 router.route('/')
-  .get(authorization('admin', 'artist', 'user'), ArtistController.getAll)
-  .post(authorization('admin', 'artist'), upload.single('img'), ArtistController.create);
+  .get(authorization(), ArtistController.getAll)
+  .post(authorization(2), upload.single('img'), ArtistController.create);
 
 export default router;
