@@ -11,9 +11,9 @@ export default (...roles) => (req, res, next) => {
       res.status(400).json({ message: 'Авторизационный метод неподдерживается' });
       return;
     }
-    const { id, role } = jwt.verify(token, process.env.SECRET_KEY);
+    const { id, login, role } = jwt.verify(token, process.env.SECRET_KEY);
     if (roles.includes(role)) {
-      res.locals.user = { id, role };
+      res.locals.user = { id, login, role };
       next();
     } else {
       res.sendStatus(403);
