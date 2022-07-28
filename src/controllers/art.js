@@ -4,8 +4,8 @@ import jwt from 'jsonwebtoken';
 import sequelize from 'sequelize';
 import models from '../models/index.js';
 import db from '../db/db.js';
-import { buildImgPath } from '../helpers/paths.js';
-import resizeAndWriteFile from '../helpers/resize.js';
+import { buildImgPath } from '../utils/paths.js';
+import resizeAndWriteFile from '../utils/resize.js';
 
 const {
   Art, ArtExtraImg, ArtProp, Artist, ArtArtist, MarkArt, UserArtLike,

@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import multer from 'multer';
-import { defaultLimits, fileFilter } from '../helpers/multer.js';
+import { defaultLimits, fileFilter } from '../utils/multer.js';
 import ArtController from '../controllers/art.js';
 import authorization from '../middlewares/authorization.js';
 

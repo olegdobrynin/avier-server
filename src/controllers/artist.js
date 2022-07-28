@@ -3,8 +3,8 @@ import fs from 'fs/promises';
 import { Op } from 'sequelize';
 import models from '../models/index.js';
 import sequelize from '../db/db.js';
-import { buildImgPath } from '../helpers/paths.js';
-import resizeAndWriteFile from '../helpers/resize.js';
+import { buildImgPath } from '../utils/paths.js';
+import resizeAndWriteFile from '../utils/resize.js';
 import ApiError from '../errors/ApiError.js';
 
 const { Artist, User } = models;

@@ -1,7 +1,7 @@
 import fs from 'fs';
 import { DataTypes } from 'sequelize';
 import sequelize from '../db/db.js';
-import { getDirname } from '../helpers/paths.js';
+import { getDirname } from '../utils/paths.js';
 
 const __dirname = getDirname(import.meta.url);
 
