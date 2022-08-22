@@ -10,7 +10,15 @@ const __dirname = getDirname(import.meta.url);
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: ['https://avier.ru', 'https://avier-react.vercel.app'],
+  methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  maxAge: 86400,
+  credentials: false,
+  preflightContinue: false,
+  optionsSuccessStatus: 204,
+}));
 app.use(express.static(path.resolve(__dirname, '..', 'static')));
 app.use('/api', router);
 app.use(notFoundHandler);
