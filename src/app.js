@@ -11,7 +11,7 @@ const __dirname = getDirname(import.meta.url);
 const app = express();
 
 app.use(cors({
-  origin: ['https://avier.ru', 'https://avier-react.vercel.app'],
+  origin: ['http://localhost:3000', 'https://avier.ru', 'https://avier-react.vercel.app'],
   methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   maxAge: 86400,
