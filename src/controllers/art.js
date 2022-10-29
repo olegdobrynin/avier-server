@@ -1,11 +1,9 @@
 import { v4 } from 'uuid';
-import fs from 'fs/promises';
 import jwt from 'jsonwebtoken';
 import sequelize from 'sequelize';
 import models from '../models/index.js';
 import db from '../db/db.js';
-import { buildImgPath } from '../utils/paths.js';
-import resizeAndWriteFile from '../utils/resize.js';
+import { uploadImage, removeImage } from '../utils/imgs.js';
 
 const {
   Art, ArtExtraImg, ArtProp, Artist, ArtArtist, MarkArt, UserArtLike,
@@ -63,8 +61,7 @@ export default class ArtController {
           await ArtExtraImg.bulkCreate(extraImgs, { returning: false, transaction });
 
           const promises = [mainImgName, ...extraImgNames]
-            .map((imgName) => buildImgPath('arts', imgName))
-            .map((imgPath, i) => resizeAndWriteFile(req.files[i].buffer, imgPath));
+            .map((imgName, i) => uploadImage(req.files[i].buffer, 'arts', imgName));
 
           await Promise.all(promises);
         }
@@ -170,7 +167,7 @@ export default class ArtController {
         await art.destroy({ transaction });
         if (mainImgName !== 'default.jpg') {
           const promises = [{ img: mainImgName }, ...extraImgNames].map(({ img: imgName }) => (
-            fs.rm(buildImgPath('arts', imgName))
+            removeImage('arts', imgName)
               .catch((err) => (err.code === 'ENOENT' ? null : next(err)))
           ));
           await Promise.all(promises);

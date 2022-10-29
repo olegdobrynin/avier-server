@@ -1,10 +1,8 @@
 import { v4 } from 'uuid';
-import fs from 'fs/promises';
 import { Op } from 'sequelize';
 import models from '../models/index.js';
 import sequelize from '../db/db.js';
-import { buildImgPath } from '../utils/paths.js';
-import resizeAndWriteFile from '../utils/resize.js';
+import { uploadImage, removeImage } from '../utils/imgs.js';
 import ApiError from '../errors/ApiError.js';
 
 const { Artist, User } = models;
@@ -18,15 +16,14 @@ export default class ArtistController {
 
         const artist = await Artist.findOne({ where: { name: { [Op.iLike]: req.body.name } } });
         if (artist) {
-          next(new ApiError('Художник с таким именем уже существует.', 400));
-          return;
+          throw new ApiError('Художник с таким именем уже существует.', 400);
         }
         const { id, name, img } = await Artist.create(
           { ...req.body, user_id: Number(userId), img: imgName },
           { returning: ['id', 'name', 'img'], transaction },
         );
         if (req.file) {
-          await resizeAndWriteFile(req.file.buffer, buildImgPath('artists', imgName));
+          await uploadImage(req.file.buffer, 'artists', imgName);
         }
 
         res.status(201).json({ id, name, img });
@@ -91,9 +88,9 @@ export default class ArtistController {
         }, { transaction });
         if (req.file) {
           if (oldImgName !== 'default.jpg') {
-            await fs.rm(buildImgPath('artists', oldImgName));
+            await removeImage('artists', oldImgName);
           }
-          await resizeAndWriteFile(req.file.buffer, buildImgPath('artists', newImgName));
+          await uploadImage(req.file.buffer, 'artists', newImgName);
         }
 
         res.json({ name: data.name, bio: data.bio, img: data.img });
@@ -119,7 +116,7 @@ export default class ArtistController {
 
         await artist.destroy({ transaction });
         if (imgName !== 'default.jpg') {
-          await fs.rm(buildImgPath('artists', imgName));
+          await removeImage('artists', imgName);
         }
         res.sendStatus(204);
       });

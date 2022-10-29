@@ -1,6 +1,6 @@
 import sharp from 'sharp';
 
-export default (file, path) => sharp(file)
+export default (file) => sharp(file)
   .resize({
     width: 1500,
     height: 1500,
@@ -8,4 +8,4 @@ export default (file, path) => sharp(file)
     withoutEnlargement: true,
   })
   .jpeg({ mozjpeg: true })
-  .toFile(path);
+  .toBuffer();
