@@ -11,6 +11,9 @@ module.exports = {
       PORT: 5000,
       DATABASE_URL: 'postgres://login:password@localhost:5432/avier',
       SECRET_KEY: '',
+      AWS_ACCESS_KEY_ID: '',
+      AWS_SECRET_ACCESS_KEY: '',
+      AWS_BUCKET_NAME: '',
     },
   }],
 };
