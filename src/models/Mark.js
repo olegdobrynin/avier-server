@@ -3,13 +3,13 @@ import { Model } from 'sequelize';
 export default (sequelize, DataTypes) => {
   class Mark extends Model {
     static associate({ Art, MarkArt, User }) {
-      this.belongsTo(User, { foreignKey: 'user_id' });
-      this.belongsToMany(Art, { through: MarkArt, foreignKey: 'mark_id', as: 'arts' });
+      this.belongsTo(User, { foreignKey: 'userId' });
+      this.belongsToMany(Art, { through: MarkArt, foreignKey: 'markId', as: 'arts' });
     }
   }
 
   Mark.init({
-    user_id: {
+    userId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
@@ -18,6 +18,7 @@ export default (sequelize, DataTypes) => {
     },
   }, {
     sequelize,
+    underscored: true,
     timestamps: false,
     tableName: 'marks',
     modelName: 'Mark',

@@ -18,7 +18,7 @@ export default class ArtistController {
         throw new ApiError('Художник с таким именем уже существует.', 400);
       }
       const { id, name, img } = await Artist.create(
-        { ...req.body, user_id: userId, img: imgName },
+        { ...req.body, userId, img: imgName },
         { returning: ['id', 'name', 'img'], transaction },
       );
       if (req.file) {
@@ -42,7 +42,7 @@ export default class ArtistController {
   static async getAll(req) {
     const { id: userId } = req.user;
     const artists = await Artist.findAll({
-      where: { user_id: userId },
+      where: { userId },
       attributes: ['id', 'name', 'img'],
       order: [['id', 'ASC']],
     });
@@ -55,7 +55,7 @@ export default class ArtistController {
       const { id: userId, role } = req.user;
       const { id } = req.params;
       const { name, bio, userLogin } = req.body;
-      const where = role === 'admin' ? { id } : { id, user_id: userId };
+      const where = role === 'admin' ? { id } : { id, userId };
 
       const artist = await Artist.findOne({
         where, returning: ['img'], rejectOnEmpty: true, transaction,
@@ -70,7 +70,7 @@ export default class ArtistController {
       const newImgName = req.file ? `${v4()}.jpg` : oldImgName;
 
       const data = await artist.update({
-        name, bio, img: newImgName, user_id: user.id,
+        name, bio, img: newImgName, userId: user.id,
       }, { transaction });
       if (req.file) {
         if (oldImgName !== 'default.jpg') {
@@ -87,7 +87,7 @@ export default class ArtistController {
     await sequelize.transaction(async (transaction) => {
       const { id: userId, role } = req.user;
       const { id } = req.params;
-      const where = role === 'admin' ? { id } : { id, user_id: userId };
+      const where = role === 'admin' ? { id } : { id, userId };
 
       const artist = await Artist.findOne({
         where, attributes: ['id', 'img'], rejectOnEmpty: true, transaction,

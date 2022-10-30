@@ -4,14 +4,14 @@ export default (sequelize, DataTypes) => {
   class MarkArt extends Model {}
 
   MarkArt.init({
-    mark_id: {
+    markId: {
       type: DataTypes.STRING,
       allowNull: false,
       references: {
         model: 'marks',
       },
     },
-    art_id: {
+    artId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
@@ -20,6 +20,7 @@ export default (sequelize, DataTypes) => {
     },
   }, {
     sequelize,
+    underscored: true,
     timestamps: false,
     tableName: 'mark_arts',
     modelName: 'MarkArt',

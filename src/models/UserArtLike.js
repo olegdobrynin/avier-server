@@ -3,20 +3,20 @@ import { Model } from 'sequelize';
 export default (sequelize, DataTypes) => {
   class UserArtLike extends Model {
     static associate({ Art, User }) {
-      this.belongsTo(Art, { foreignKey: 'art_id' });
-      this.belongsTo(User, { foreignKey: 'user_id' });
+      this.belongsTo(Art, { foreignKey: 'artId' });
+      this.belongsTo(User, { foreignKey: 'userId' });
     }
   }
 
   UserArtLike.init({
-    user_id: {
+    userId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
         model: 'users',
       },
     },
-    art_id: {
+    artId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
@@ -25,6 +25,7 @@ export default (sequelize, DataTypes) => {
     },
   }, {
     sequelize,
+    underscored: true,
     timestamps: false,
     tableName: 'user_art_likes',
     modelName: 'UserArtLike',

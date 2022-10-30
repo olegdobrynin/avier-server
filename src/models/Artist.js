@@ -3,9 +3,9 @@ import { Model } from 'sequelize';
 export default (sequelize, DataTypes) => {
   class Artist extends Model {
     static associate({ Art, ArtArtist, User }) {
-      this.hasMany(ArtArtist, { foreignKey: 'artist_id', hooks: true, onDelete: 'CASCADE' });
-      this.belongsTo(User, { foreignKey: 'user_id' });
-      this.belongsToMany(Art, { through: ArtArtist, foreignKey: 'artist_id', as: 'arts' });
+      this.hasMany(ArtArtist, { foreignKey: 'artistId', hooks: true, onDelete: 'CASCADE' });
+      this.belongsTo(User, { foreignKey: 'userId' });
+      this.belongsToMany(Art, { through: ArtArtist, foreignKey: 'artistId', as: 'arts' });
     }
 
     static getModel(...attributes) {
@@ -23,7 +23,7 @@ export default (sequelize, DataTypes) => {
       type: DataTypes.STRING(50),
       allowNull: false,
     },
-    user_id: {
+    userId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
@@ -40,8 +40,7 @@ export default (sequelize, DataTypes) => {
     },
   }, {
     sequelize,
-    createdAt: 'created_at',
-    updatedAt: 'updated_at',
+    underscored: true,
     tableName: 'artists',
     modelName: 'Artist',
   });

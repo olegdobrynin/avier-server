@@ -6,17 +6,17 @@ const { MarkArt } = models;
 
 export default class MarkController {
   static async mark(req, reply) {
-    const { id } = req.user;
+    const { id: userId } = req.user;
     const { artId } = req.params;
-    await MarkArt.create({ mark_id: Number(id), art_id: artId });
+    await MarkArt.create({ markId: userId, artId });
 
     reply.code(204);
   }
 
   static async unMark(req, reply) {
-    const { id } = req.user;
+    const { id: userId } = req.user;
     const { artId } = req.params;
-    await MarkArt.destroy({ where: { mark_id: Number(id), art_id: artId } });
+    await MarkArt.destroy({ where: { markId: userId, artId } });
 
     reply.code(204);
   }

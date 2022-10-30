@@ -4,14 +4,14 @@ export default (sequelize, DataTypes) => {
   class ArtArtist extends Model {}
 
   ArtArtist.init({
-    art_id: {
+    artId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
         model: 'arts',
       },
     },
-    artist_id: {
+    artistId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
@@ -20,6 +20,7 @@ export default (sequelize, DataTypes) => {
     },
   }, {
     sequelize,
+    underscored: true,
     timestamps: false,
     tableName: 'art_artists',
     modelName: 'ArtArtist',

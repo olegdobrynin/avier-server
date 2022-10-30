@@ -36,7 +36,7 @@ export default class ArtController {
           year: Number(year) || null,
           city: city || null,
           about: about || null,
-          type_id: Number(typeId),
+          typeId: Number(typeId),
           img: mainImgName,
         },
         { returning: ['id'], transaction },
@@ -44,9 +44,9 @@ export default class ArtController {
 
       const artProperties = JSON.parse(properties)
         .filter(({ title, description }) => title && description)
-        .map((property) => ({ ...property, art_id: artId }));
+        .map((property) => ({ ...property, artId }));
       const artArtists = filteredArtists
-        .map(({ artistId }) => ({ art_id: artId, artist_id: Number(artistId) }));
+        .map(({ artistId }) => ({ artId, artistId }));
 
       await ArtProp.bulkCreate(artProperties, { returning: false, transaction });
       await ArtArtist.bulkCreate(artArtists, { returning: false, transaction });
@@ -55,7 +55,7 @@ export default class ArtController {
         const extraImgNames = [...Array(req.files.length - 1)]
           .map(() => `${v4()}.jpg`);
         const extraImgs = extraImgNames
-          .map((imgName) => ({ art_id: artId, img: imgName }));
+          .map((imgName) => ({ artId, img: imgName }));
 
         await ArtExtraImg.bulkCreate(extraImgs, { returning: false, transaction });
 
@@ -101,34 +101,34 @@ export default class ArtController {
   }
 
   static async getOne(req) {
-    const user = req.headers.authorization
+    const { id: userId } = req.headers.authorization
       ? await req.jwtVerify()
       : { id: null };
     const { artId } = req.params;
-    const extraModels = user.id
+    const extraModels = userId
       ? [{
         model: MarkArt,
         as: 'mark',
         attributes: [[sequelize.cast(sequelize.col('mark_id'), 'BOOL'), 'mark']],
         required: false,
-        where: { mark_id: user.id },
+        where: { markId: userId },
       }, {
         model: UserArtLike,
         as: 'like',
         attributes: [[sequelize.cast(sequelize.col('like.art_id'), 'BOOL'), 'like']],
         required: false,
-        where: { user_id: user.id },
+        where: { userId },
       }]
       : [];
 
     const art = await Art.findByPk(artId, {
-      attributes: { exclude: ['id', 'type_id', 'created_at', 'updated_at'] },
+      attributes: { exclude: ['id', 'typeId', 'createdAt', 'updatedAt'] },
       include: [Artist.getModel('id', 'name'), ArtProp.model, ArtExtraImg.model, ...extraModels],
       rejectOnEmpty: true,
     });
 
     const likes = await UserArtLike.count({
-      where: { art_id: artId }, col: ['user_id'], distinct: true,
+      where: { artId }, col: ['userId'], distinct: true,
     });
 
     const { dataValues: { img: mainImg, extraImgs } } = art;
@@ -140,9 +140,7 @@ export default class ArtController {
     await db.transaction(async (transaction) => {
       const { id: userId, role } = req.user;
       const { artId } = req.params;
-      const include = role === 'admin'
-        ? null
-        : { model: Artist, as: 'artists', where: { user_id: userId } };
+      const include = role === 'admin' ? null : { model: Artist, as: 'artists', where: { userId } };
 
       const art = await Art.findByPk(artId, {
         attributes: ['id', 'img'], include, rejectOnEmpty: true, transaction,
@@ -150,7 +148,7 @@ export default class ArtController {
 
       const { img: mainImgName } = art;
       const extraImgNames = await ArtExtraImg
-        .findAll({ where: { art_id: artId }, attributes: ['img'], transaction });
+        .findAll({ where: { artId }, attributes: ['img'], transaction });
 
       await art.destroy({ transaction });
       if (mainImgName !== 'default.jpg') {

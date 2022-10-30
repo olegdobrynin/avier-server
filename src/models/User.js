@@ -5,18 +5,18 @@ export default (sequelize, DataTypes) => {
     static associate({
       Art, Artist, Mark, MarkArt, UserArtLike,
     }) {
-      this.hasMany(MarkArt, { foreignKey: 'mark_id', hooks: true, onDelete: 'CASCADE' });
-      this.hasOne(Mark, { foreignKey: 'user_id', hooks: true, onDelete: 'CASCADE' });
-      this.hasMany(Artist, { foreignKey: 'user_id', as: 'artists' });
+      this.hasMany(MarkArt, { foreignKey: 'markId', hooks: true, onDelete: 'CASCADE' });
+      this.hasOne(Mark, { foreignKey: 'userId', hooks: true, onDelete: 'CASCADE' });
+      this.hasMany(Artist, { foreignKey: 'userId', as: 'artists' });
       this.hasMany(UserArtLike, {
-        foreignKey: 'user_id', as: 'like', onDelete: 'CASCADE', hooks: true,
+        foreignKey: 'userId', as: 'like', onDelete: 'CASCADE', hooks: true,
       });
-      this.belongsToMany(Art, { through: UserArtLike, foreignKey: 'user_id', as: 'likes' });
+      this.belongsToMany(Art, { through: UserArtLike, foreignKey: 'userId', as: 'likes' });
     }
 
     toJSON() {
       return {
-        ...this.get(), password: undefined, created_at: undefined, updated_at: undefined,
+        ...this.get(), password: undefined, createdAt: undefined, updatedAt: undefined,
       };
     }
   }
@@ -38,8 +38,7 @@ export default (sequelize, DataTypes) => {
     },
   }, {
     sequelize,
-    createdAt: 'created_at',
-    updatedAt: 'updated_at',
+    underscored: true,
     tableName: 'users',
     modelName: 'User',
   });

@@ -5,32 +5,34 @@ export default (sequelize, DataTypes) => {
     static associate({
       ArtExtraImg, ArtProp, Artist, ArtArtist, Mark, MarkArt, Type, User, UserArtLike,
     }) {
-      this.hasMany(ArtArtist, { foreignKey: 'art_id', hooks: true, onDelete: 'CASCADE' });
+      this.hasMany(ArtArtist, { foreignKey: 'artId', hooks: true, onDelete: 'CASCADE' });
       this.hasMany(ArtExtraImg, {
-        foreignKey: 'art_id', as: 'extraImgs', hooks: true, onDelete: 'CASCADE',
+        foreignKey: 'artId', as: 'extraImgs', hooks: true, onDelete: 'CASCADE',
       });
       this.hasMany(ArtProp, {
-        foreignKey: 'art_id', as: 'properties', hooks: true, onDelete: 'CASCADE',
+        foreignKey: 'artId', as: 'properties', hooks: true, onDelete: 'CASCADE',
       });
       this.hasMany(MarkArt, {
-        foreignKey: 'art_id', as: 'mark', hooks: true, onDelete: 'CASCADE',
+        foreignKey: 'artId', as: 'mark', hooks: true, onDelete: 'CASCADE',
       });
       this.hasMany(UserArtLike, {
-        foreignKey: 'art_id', as: 'like', hooks: true, onDelete: 'CASCADE',
+        foreignKey: 'artId', as: 'like', hooks: true, onDelete: 'CASCADE',
       });
-      this.belongsTo(Type, { foreignKey: 'type_id', as: 'type' });
-      this.belongsToMany(Artist, { through: ArtArtist, foreignKey: 'art_id', as: 'artists' });
-      this.belongsToMany(Mark, { through: MarkArt, foreignKey: 'art_id', as: 'marks' });
-      this.belongsToMany(User, { through: UserArtLike, foreignKey: 'art_id', as: 'likes' });
+      this.belongsTo(Type, { foreignKey: 'typeId', as: 'type' });
+      this.belongsToMany(Artist, { through: ArtArtist, foreignKey: 'artId', as: 'artists' });
+      this.belongsToMany(Mark, { through: MarkArt, foreignKey: 'artId', as: 'marks' });
+      this.belongsToMany(User, { through: UserArtLike, foreignKey: 'artId', as: 'likes' });
     }
 
     toJSON() {
-      return { ...this.get(), extraImgs: undefined };
+      return {
+        ...this.get(), extraImgs: undefined, createdAt: undefined, updatedAt: undefined,
+      };
     }
   }
 
   Art.init({
-    type_id: {
+    typeId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
@@ -57,8 +59,7 @@ export default (sequelize, DataTypes) => {
     },
   }, {
     sequelize,
-    createdAt: 'created_at',
-    updatedAt: 'updated_at',
+    underscored: true,
     tableName: 'arts',
     modelName: 'Art',
   });

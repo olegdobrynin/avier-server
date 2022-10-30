@@ -3,7 +3,7 @@ import { Model } from 'sequelize';
 export default (sequelize, DataTypes) => {
   class Type extends Model {
     static associate({ Art }) {
-      this.hasMany(Art, { foreignKey: 'type_id' });
+      this.hasMany(Art, { foreignKey: 'typeId' });
     }
   }
 
@@ -15,8 +15,7 @@ export default (sequelize, DataTypes) => {
     },
   }, {
     sequelize,
-    createdAt: 'created_at',
-    updatedAt: 'updated_at',
+    underscored: true,
     tableName: 'types',
     modelName: 'Type',
   });

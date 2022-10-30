@@ -25,7 +25,7 @@ export default class UserController {
         { login, password: hashPassword },
         { returning: ['id', 'login', 'role'], transaction },
       );
-      await Mark.create({ user_id: user.id }, { returning: false, transaction });
+      await Mark.create({ userId: user.id }, { returning: false, transaction });
 
       const payload = { id: user.id, login, role: user.role };
       const token = await reply.jwtSign(payload, { expiresIn: '7d' });

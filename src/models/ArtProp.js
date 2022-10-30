@@ -3,7 +3,7 @@ import { Model } from 'sequelize';
 export default (sequelize, DataTypes) => {
   class ArtProp extends Model {
     static associate({ Art }) {
-      this.belongsTo(Art, { foreignKey: 'art_id' });
+      this.belongsTo(Art, { foreignKey: 'artId' });
     }
 
     static get model() {
@@ -16,7 +16,7 @@ export default (sequelize, DataTypes) => {
   }
 
   ArtProp.init({
-    art_id: {
+    artId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
@@ -33,8 +33,7 @@ export default (sequelize, DataTypes) => {
     },
   }, {
     sequelize,
-    createdAt: 'created_at',
-    updatedAt: 'updated_at',
+    underscored: true,
     tableName: 'art_properties',
     modelName: 'ArtProp',
   });
