@@ -13,12 +13,12 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.199.0",
     "@fastify/cors": "^8.1.1",
+    "@fastify/jwt": "^6.3.2",
     "@fastify/static": "^6.5.0",
     "bcrypt": "^5.1.0",
     "dotenv": "^16.0.3",
     "fastify": "^4.9.2",
     "fastify-multer": "^2.0.3",
-    "jsonwebtoken": "^8.5.1",
     "pg": "^8.8.0",
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.25.3",
