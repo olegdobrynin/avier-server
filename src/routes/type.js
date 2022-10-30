@@ -1,12 +1,40 @@
-import express, { Router } from 'express';
 import TypeController from '../controllers/type.js';
-import authorization from '../middlewares/authorization.js';
 
-const router = new Router();
+const type = {
+  type: 'object',
+  properties: {
+    id: { type: 'integer' },
+    name: { type: 'string' },
+  },
+};
 
-router.delete('/:id(\\d+)', authorization(0), TypeController.delete);
-router.route('/')
-  .get(TypeController.getAll)
-  .post(authorization(0), express.json(), TypeController.create);
+const types = { type: 'array', items: type };
 
-export default router;
+export default async (fastify) => fastify
+  .get('/', {
+    schema: {
+      response: { 200: types },
+    },
+    handler: TypeController.getAll,
+  })
+  .post('/', {
+    schema: {
+      body: {
+        type: 'object',
+        required: ['name'],
+        additionalProperties: false,
+        properties: { name: { type: 'string', nullable: false } },
+      },
+      response: { 201: type },
+    },
+    onRequest: [fastify.authorization(0)],
+    handler: TypeController.create,
+  })
+  .delete('/:id(\\d+)', {
+    schema: {
+      params: { id: { type: 'integer', minimum: 1 } },
+      response: { 204: {} },
+    },
+    onRequest: [fastify.authorization(0)],
+    handler: TypeController.delete,
+  });

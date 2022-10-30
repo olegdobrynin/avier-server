@@ -1,17 +1,21 @@
 export default class FolderController {
-  static async create(req, res) {
+  static async create(req, reply) {
 
   }
 
-  static async edit(req, res) {
+  static async update(req, reply) {
 
   }
 
-  static async getAll(req, res) {
+  static async getOne(req, reply) {
 
   }
 
-  static async delete(req, res) {
+  static async getAll(req, reply) {
+
+  }
+
+  static async delete(req, reply) {
 
   }
 }

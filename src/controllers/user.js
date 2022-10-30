@@ -1,5 +1,4 @@
 import { hash, compareSync } from 'bcrypt';
-import jwt from 'jsonwebtoken';
 import { Op, ForeignKeyConstraintError } from 'sequelize';
 import models from '../models/index.js';
 import sequelize from '../db/db.js';
@@ -7,108 +6,82 @@ import ApiError from '../errors/ApiError.js';
 
 const { Mark, User } = models;
 
-const generateJwt = (id, login, role) => jwt.sign(
-  { id, login, role },
-  process.env.SECRET_KEY,
-  { expiresIn: '7d' },
-);
-
 export default class UserController {
-  static async registration(req, res, next) {
-    try {
-      const { login, password } = req.body;
-      if (!login) {
-        next(new ApiError('Введите логин', 400));
-        return;
-      }
-      const candidate = await User.findOne({ where: { login: { [Op.iLike]: login } } });
-      if (candidate) {
-        next(new ApiError('Такой логин уже зарегистрирован', 400));
-        return;
-      }
-      if (password.length < 8) {
-        next(new ApiError('Введите пароль длиннее 8 символов', 400));
-        return;
-      }
-      const hashPassword = await hash(password, 5);
-      await sequelize.transaction(async (transaction) => {
-        const user = await User.create(
-          { login, password: hashPassword },
-          { returning: ['id', 'login', 'role'], transaction },
-        );
-        await Mark.create({ user_id: user.id }, { returning: false, transaction });
-
-        const token = generateJwt(user.id, user.login, user.role);
-        res.json({ user, token });
-      });
-    } catch (error) {
-      next(error);
+  static async registration(req, reply) {
+    const { login, password } = req.body;
+    if (!login) {
+      throw new ApiError('Введите логин', 400);
     }
+    const candidate = await User.findOne({ where: { login: { [Op.iLike]: login } } });
+    if (candidate) {
+      throw new ApiError('Такой логин уже зарегистрирован', 400);
+    }
+    if (password.length < 8) {
+      throw new ApiError('Введите пароль длиннее 8 символов', 400);
+    }
+    const hashPassword = await hash(password, 5);
+    return sequelize.transaction(async (transaction) => {
+      const user = await User.create(
+        { login, password: hashPassword },
+        { returning: ['id', 'login', 'role'], transaction },
+      );
+      await Mark.create({ user_id: user.id }, { returning: false, transaction });
+
+      const payload = { id: user.id, login, role: user.role };
+      const token = await reply.jwtSign(payload, { expiresIn: '7d' });
+
+      reply.code(201);
+      return { user, token };
+    });
   }
 
-  static async login(req, res, next) {
-    try {
-      const { login, password } = req.body;
-      const user = await User.findOne({ where: { login } });
-      if (!user) {
-        next(new ApiError('Пользователь не найден', 400));
-        return;
-      }
-      const comparePassword = compareSync(password, user.password);
-      if (!comparePassword) {
-        next(new ApiError('Пароль не верный', 400));
-        return;
-      }
-      const token = generateJwt(user.id, user.login, user.role);
-
-      res.json({ user, token });
-    } catch (error) {
-      next(error);
+  static async login(req, reply) {
+    const { login, password } = req.body;
+    const user = await User.findOne({ where: { login } });
+    if (!user) {
+      throw new ApiError('Пользователь не найден', 400);
     }
+    const comparePassword = compareSync(password, user.password);
+    if (!comparePassword) {
+      throw new ApiError('Пароль не верный', 400);
+    }
+    const payload = { id: user.id, login, role: user.role };
+    const token = await reply.jwtSign(payload, { expiresIn: '7d' });
+
+    return { user, token };
   }
 
-  static async check(_req, res, next) {
-    try {
-      const { id, login, role } = res.locals.user;
-      const token = generateJwt(id, login, role);
+  static async check(req, reply) {
+    const { user } = req;
+    const token = await reply.jwtSign(user, { expiresIn: '7d' });
 
-      res.json({ user: { id, login, role }, token });
-    } catch (error) {
-      next(error);
-    }
+    return { user, token };
   }
 
-  static async changeRole(req, res, next) {
-    try {
-      const { login, role } = req.body;
-      await User.update({ role }, { where: { login }, fields: ['role'] });
-      res.sendStatus(204);
-    } catch (error) {
-      next(error);
-    }
+  static async changeRole(req, reply) {
+    const { login, role } = req.body;
+    await User.update({ role }, { where: { login }, fields: ['role'] });
+
+    reply.code(204);
   }
 
-  static async delete(req, res, next) {
+  static async delete(req, reply) {
     try {
-      const { id: userId, role } = res.locals.user;
+      const { id: userId, role } = req.user;
       const { id } = req.params;
-      if (Number(id) !== userId && role !== 'admin') {
-        res.sendStatus(403);
+      if (id !== userId && role !== 'admin') {
+        reply.code(403);
         return;
       }
-      const user = await User.findByPk(Number(id), { rejectOnEmpty: true });
+      const user = await User.findByPk(id, { rejectOnEmpty: true });
+      await user.destroy();
 
-      await sequelize.transaction(async (transaction) => {
-        await user.destroy({ transaction });
-
-        res.sendStatus(204);
-      });
+      reply.code(204);
     } catch (error) {
       if (error instanceof ForeignKeyConstraintError) {
-        next(new ApiError('Невозможно удалить пользователя с художниками!', 400));
-        return;
+        throw new ApiError('Невозможно удалить пользователя с художниками!', 400);
       }
-      next(error);
+      throw error;
     }
   }
 }

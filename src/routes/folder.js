@@ -1,12 +1,23 @@
-import { Router } from 'express';
 import folderController from '../controllers/folder.js';
 
-const router = new Router();
-
-router.route('/')
-  .post(folderController.create)
-  .get(folderController.getAll)
-  .post(folderController.edit)
-  .delete(folderController.delete);
-
-export default router;
+export default async (fastify) => fastify
+  .get('/', {
+    schema: {},
+    handler: folderController.getAll,
+  })
+  .post('/', {
+    schema: {},
+    handler: folderController.create,
+  })
+  .get('/:id(\\d+)', {
+    schema: {},
+    handler: folderController.getOne,
+  })
+  .patch('/:id(\\d+)', {
+    schema: {},
+    handler: folderController.update,
+  })
+  .delete('/:id(\\d+)', {
+    schema: {},
+    handler: folderController.delete,
+  });

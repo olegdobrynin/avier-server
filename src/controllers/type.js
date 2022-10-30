@@ -3,35 +3,24 @@ import models from '../models/index.js';
 const { Type } = models;
 
 export default class TypeController {
-  static async create(req, res, next) {
-    try {
-      const { name } = req.body;
-      const { id } = await Type.create({ name });
+  static async create(req, reply) {
+    const { name } = req.body;
+    const { id } = await Type.create({ name });
 
-      res.status(201).json({ id, name });
-    } catch (error) {
-      next(error);
-    }
+    reply.code(201);
+    return { id, name };
   }
 
-  static async getAll(_req, res, next) {
-    try {
-      const types = await Type.findAll({ attributes: ['id', 'name'] });
+  static async getAll() {
+    const types = await Type.findAll({ attributes: ['id', 'name'] });
 
-      res.json(types);
-    } catch (error) {
-      next(error);
-    }
+    return types;
   }
 
-  static async delete(req, res, next) {
-    try {
-      const { id } = req.params;
-      await Type.destroy({ where: { id } });
+  static async delete(req, reply) {
+    const { id } = req.params;
+    await Type.destroy({ where: { id } });
 
-      res.sendStatus(204);
-    } catch (error) {
-      next(error);
-    }
+    reply.code(204);
   }
 }

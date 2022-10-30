@@ -1,11 +1,21 @@
-import { Router } from 'express';
 import LikeController from '../controllers/like.js';
 
-const router = new Router();
+const artId = { type: 'integer', minimum: 1 };
 
-router.get('/', LikeController.getAll);
-router.route('/:artId(\\d+)')
-  .post(LikeController.like)
-  .delete(LikeController.unLike);
-
-export default router;
+export default async (fastify) => fastify
+  .post('/:artId(\\d+)', {
+    schema: {
+      params: { artId },
+      response: { 204: {} },
+    },
+    onRequest: [fastify.authorization(2)],
+    handler: LikeController.like,
+  })
+  .delete('/:artId(\\d+)', {
+    schema: {
+      params: { artId },
+      response: { 204: {} },
+    },
+    onRequest: [fastify.authorization(2)],
+    handler: LikeController.unLike,
+  });

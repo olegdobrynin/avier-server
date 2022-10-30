@@ -1,19 +1,14 @@
-import { Router } from 'express';
 import artRouter from './art.js';
 import artistRouter from './artist.js';
 import likeRouter from './like.js';
 import markRouter from './mark.js';
 import typeRouter from './type.js';
 import userRouter from './user.js';
-import authorization from '../middlewares/authorization.js';
 
-const router = new Router();
-
-router.use('/art', artRouter);
-router.use('/artist', artistRouter);
-router.use('/like', authorization(2), likeRouter);
-router.use('/mark', authorization(2), markRouter);
-router.use('/type', typeRouter);
-router.use('/user', userRouter);
-
-export default router;
+export default async (fastify) => fastify
+  .register(artRouter, { prefix: '/art' })
+  .register(artistRouter, { prefix: '/artist' })
+  .register(likeRouter, { prefix: '/like' })
+  .register(markRouter, { prefix: '/mark' })
+  .register(typeRouter, { prefix: '/type' })
+  .register(userRouter, { prefix: '/user' });
