@@ -34,6 +34,7 @@ export default (sequelize, DataTypes) => {
   }, {
     sequelize,
     underscored: true,
+    timestamps: false,
     tableName: 'art_properties',
     modelName: 'ArtProp',
   });
