@@ -14,10 +14,9 @@ const app = fastify();
 app.setErrorHandler(errorHandler);
 await app.register(cors, {
   origin: ['http://localhost:3000', 'https://avier.ru', 'https://avier-react.vercel.app'],
-  methods: ['PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  methods: ['PATCH', 'DELETE'],
+  allowedHeaders: ['Authorization', 'Content-Type'],
   maxAge: 86400,
-  credentials: false,
   optionsSuccessStatus: 204,
 });
 await app.register(staticHandler, { root: path.resolve(__dirname, '..', 'static') });
