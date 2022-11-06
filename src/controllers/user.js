@@ -4,7 +4,7 @@ import models from '../models/index.js';
 import sequelize from '../db/db.js';
 import ApiError from '../errors/ApiError.js';
 
-const { Mark, User } = models;
+const { User } = models;
 
 export default class UserController {
   static async registration(req, reply) {
@@ -25,7 +25,6 @@ export default class UserController {
         { login, password: hashPassword },
         { returning: ['id', 'login', 'role'], transaction },
       );
-      await Mark.create({ userId: user.id }, { returning: false, transaction });
 
       const payload = { id: user.id, login, role: user.role };
       const token = await reply.jwtSign(payload, { expiresIn: '7d' });

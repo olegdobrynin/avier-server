@@ -3,12 +3,11 @@ import { Model } from 'sequelize';
 export default (sequelize, DataTypes) => {
   class User extends Model {
     static associate({
-      Art, Artist, Mark, MarkArt, UserArtLike,
+      Art, Artist, UserArtLike, UserArtMark,
     }) {
-      this.hasMany(MarkArt, { foreignKey: 'markId' });
-      this.hasOne(Mark, { foreignKey: 'userId' });
       this.hasMany(Artist, { foreignKey: 'userId', as: 'artists' });
       this.belongsToMany(Art, { through: UserArtLike, foreignKey: 'userId', as: 'likes' });
+      this.belongsToMany(Art, { through: UserArtMark, foreignKey: 'userId', as: 'marks' });
     }
 
     toJSON() {

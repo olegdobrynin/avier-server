@@ -1,14 +1,19 @@
 import { Model } from 'sequelize';
 
 export default (sequelize, DataTypes) => {
-  class MarkArt extends Model {}
+  class UserArtMark extends Model {
+    static associate({ Art, User }) {
+      this.belongsTo(Art, { foreignKey: 'artId' });
+      this.belongsTo(User, { foreignKey: 'userId' });
+    }
+  }
 
-  MarkArt.init({
-    markId: {
+  UserArtMark.init({
+    userId: {
       type: DataTypes.STRING,
       allowNull: false,
       references: {
-        model: 'marks',
+        model: 'users',
       },
     },
     artId: {
@@ -22,9 +27,9 @@ export default (sequelize, DataTypes) => {
     sequelize,
     underscored: true,
     timestamps: false,
-    tableName: 'mark_arts',
-    modelName: 'MarkArt',
+    tableName: 'user_art_marks',
+    modelName: 'UserArtMark',
   });
 
-  return MarkArt;
+  return UserArtMark;
 };

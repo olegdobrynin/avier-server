@@ -1,11 +1,6 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('marks', {
-      id: {
-        type: Sequelize.INTEGER,
-        autoIncrement: true,
-        primaryKey: true,
-      },
+    await queryInterface.createTable('user_art_marks', {
       user_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
@@ -15,10 +10,19 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
       },
+      art_id: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: {
+          model: 'arts',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
+      },
     });
   },
 
   async down(queryInterface) {
-    await queryInterface.dropTable('marks');
+    await queryInterface.dropTable('user_art_marks');
   },
 };

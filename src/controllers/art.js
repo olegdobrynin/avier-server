@@ -6,7 +6,7 @@ import { uploadImage, removeImage } from '../utils/imgs.js';
 import ApiError from '../errors/ApiError.js';
 
 const {
-  Art, ArtExtraImg, ArtProp, Artist, ArtArtist, MarkArt, UserArtLike,
+  Art, ArtExtraImg, ArtProp, Artist, ArtArtist, UserArtLike, UserArtMark,
 } = models;
 
 export default class ArtController {
@@ -85,7 +85,7 @@ export default class ArtController {
       + 'FROM arts LEFT JOIN (SELECT art_id, COUNT(*) AS likes FROM user_art_likes GROUP BY art_id) '
       + 'AS likesCount ON id = likesCount.art_id '
       + `${user.id
-        ? `LEFT JOIN (SELECT art_id, mark_id::BOOL AS mark FROM mark_arts WHERE mark_id = ${user.id}) `
+        ? `LEFT JOIN (SELECT art_id, user_id::BOOL AS mark FROM user_art_marks WHERE user_id = ${user.id}) `
       + 'AS marks ON id = marks.art_id LEFT JOIN (SELECT art_id, user_id::BOOL AS "like" '
       + `FROM user_art_likes WHERE user_id = ${user.id}) AS likes ON id = likes.art_id `
         : ''}`
@@ -107,11 +107,11 @@ export default class ArtController {
     const { artId } = req.params;
     const extraModels = userId
       ? [{
-        model: MarkArt,
+        model: UserArtMark,
         as: 'mark',
-        attributes: [[sequelize.cast(sequelize.col('mark_id'), 'BOOL'), 'mark']],
+        attributes: [[sequelize.cast(sequelize.col('mark.user_id'), 'BOOL'), 'mark']],
         required: false,
-        where: { markId: userId },
+        where: { userId },
       }, {
         model: UserArtLike,
         as: 'like',

@@ -3,16 +3,16 @@ import { Model } from 'sequelize';
 export default (sequelize, DataTypes) => {
   class Art extends Model {
     static associate({
-      ArtExtraImg, ArtProp, Artist, ArtArtist, Mark, MarkArt, Type, User, UserArtLike,
+      ArtExtraImg, ArtProp, Artist, ArtArtist, Type, User, UserArtLike, UserArtMark,
     }) {
       this.hasMany(ArtArtist, { foreignKey: 'artId' });
       this.hasMany(ArtExtraImg, { foreignKey: 'artId', as: 'extraImgs' });
       this.hasMany(ArtProp, { foreignKey: 'artId', as: 'properties' });
-      this.hasMany(MarkArt, { foreignKey: 'artId', as: 'mark' });
       this.hasMany(UserArtLike, { foreignKey: 'artId', as: 'like' });
+      this.hasMany(UserArtMark, { foreignKey: 'artId', as: 'mark' });
       this.belongsTo(Type, { foreignKey: 'typeId', as: 'type' });
       this.belongsToMany(Artist, { through: ArtArtist, foreignKey: 'artId', as: 'artists' });
-      this.belongsToMany(Mark, { through: MarkArt, foreignKey: 'artId', as: 'marks' });
+      this.belongsToMany(User, { through: UserArtMark, foreignKey: 'artId', as: 'marks' });
       this.belongsToMany(User, { through: UserArtLike, foreignKey: 'artId', as: 'likes' });
     }
 
