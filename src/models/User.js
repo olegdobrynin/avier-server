@@ -5,12 +5,9 @@ export default (sequelize, DataTypes) => {
     static associate({
       Art, Artist, Mark, MarkArt, UserArtLike,
     }) {
-      this.hasMany(MarkArt, { foreignKey: 'markId', hooks: true, onDelete: 'CASCADE' });
-      this.hasOne(Mark, { foreignKey: 'userId', hooks: true, onDelete: 'CASCADE' });
+      this.hasMany(MarkArt, { foreignKey: 'markId' });
+      this.hasOne(Mark, { foreignKey: 'userId' });
       this.hasMany(Artist, { foreignKey: 'userId', as: 'artists' });
-      this.hasMany(UserArtLike, {
-        foreignKey: 'userId', as: 'like', onDelete: 'CASCADE', hooks: true,
-      });
       this.belongsToMany(Art, { through: UserArtLike, foreignKey: 'userId', as: 'likes' });
     }
 

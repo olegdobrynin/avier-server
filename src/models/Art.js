@@ -5,19 +5,11 @@ export default (sequelize, DataTypes) => {
     static associate({
       ArtExtraImg, ArtProp, Artist, ArtArtist, Mark, MarkArt, Type, User, UserArtLike,
     }) {
-      this.hasMany(ArtArtist, { foreignKey: 'artId', hooks: true, onDelete: 'CASCADE' });
-      this.hasMany(ArtExtraImg, {
-        foreignKey: 'artId', as: 'extraImgs', hooks: true, onDelete: 'CASCADE',
-      });
-      this.hasMany(ArtProp, {
-        foreignKey: 'artId', as: 'properties', hooks: true, onDelete: 'CASCADE',
-      });
-      this.hasMany(MarkArt, {
-        foreignKey: 'artId', as: 'mark', hooks: true, onDelete: 'CASCADE',
-      });
-      this.hasMany(UserArtLike, {
-        foreignKey: 'artId', as: 'like', hooks: true, onDelete: 'CASCADE',
-      });
+      this.hasMany(ArtArtist, { foreignKey: 'artId' });
+      this.hasMany(ArtExtraImg, { foreignKey: 'artId', as: 'extraImgs' });
+      this.hasMany(ArtProp, { foreignKey: 'artId', as: 'properties' });
+      this.hasMany(MarkArt, { foreignKey: 'artId', as: 'mark' });
+      this.hasMany(UserArtLike, { foreignKey: 'artId', as: 'like' });
       this.belongsTo(Type, { foreignKey: 'typeId', as: 'type' });
       this.belongsToMany(Artist, { through: ArtArtist, foreignKey: 'artId', as: 'artists' });
       this.belongsToMany(Mark, { through: MarkArt, foreignKey: 'artId', as: 'marks' });

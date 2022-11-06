@@ -1,17 +1,14 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('user_art_likes', {
-      id: {
-        type: Sequelize.INTEGER,
-        autoIncrement: true,
-        primaryKey: true,
-      },
       user_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
           model: 'users',
         },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
       },
       art_id: {
         type: Sequelize.INTEGER,
@@ -19,6 +16,8 @@ module.exports = {
         references: {
           model: 'arts',
         },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
       },
     });
   },

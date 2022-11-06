@@ -12,6 +12,8 @@ module.exports = {
         references: {
           model: 'arts',
         },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
       },
       title: {
         type: Sequelize.STRING(20),

@@ -7,6 +7,8 @@ module.exports = {
         references: {
           model: 'arts',
         },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
       },
       artist_id: {
         type: Sequelize.INTEGER,
@@ -14,6 +16,8 @@ module.exports = {
         references: {
           model: 'artists',
         },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE',
       },
     });
   },

@@ -3,7 +3,7 @@ import { Model } from 'sequelize';
 export default (sequelize, DataTypes) => {
   class Artist extends Model {
     static associate({ Art, ArtArtist, User }) {
-      this.hasMany(ArtArtist, { foreignKey: 'artistId', hooks: true, onDelete: 'CASCADE' });
+      this.hasMany(ArtArtist, { foreignKey: 'artistId' });
       this.belongsTo(User, { foreignKey: 'userId' });
       this.belongsToMany(Art, { through: ArtArtist, foreignKey: 'artistId', as: 'arts' });
     }
