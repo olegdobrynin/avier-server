@@ -55,7 +55,7 @@ export default async (fastify) => fastify
         additionalProperties: false,
         properties: {
           login: { type: 'string', minLength: 5 },
-          role: { type: 'string', enum: ['admin', 'artist', 'user'] },
+          role: { type: 'string', enum: ['admin', 'artist', 'manager', 'user'] },
         },
       },
       response: { 204: {} },

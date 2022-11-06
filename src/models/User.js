@@ -32,7 +32,7 @@ export default (sequelize, DataTypes) => {
       allowNull: false,
     },
     role: {
-      type: DataTypes.STRING(5),
+      type: DataTypes.ENUM('admin', 'user', 'artist', 'manager'),
       allowNull: false,
       defaultValue: 'user',
     },
