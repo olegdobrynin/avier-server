@@ -10,14 +10,14 @@ export default class UserController {
   static async registration(req, reply) {
     const { login, password } = req.body;
     if (!login) {
-      throw new ApiError('Введите логин', 400);
+      throw new ApiError({ message: 'Введите логин' });
     }
     const candidate = await User.findOne({ where: { login: { [Op.iLike]: login } } });
     if (candidate) {
-      throw new ApiError('Такой логин уже зарегистрирован', 400);
+      throw new ApiError({ message: 'Такой логин уже зарегистрирован' });
     }
     if (password.length < 8) {
-      throw new ApiError('Введите пароль длиннее 8 символов', 400);
+      throw new ApiError({ message: 'Введите пароль длиннее 8 символов' });
     }
     const hashPassword = await hash(password, 5);
     return sequelize.transaction(async (transaction) => {
@@ -38,11 +38,11 @@ export default class UserController {
     const { login, password } = req.body;
     const user = await User.findOne({ where: { login } });
     if (!user) {
-      throw new ApiError('Пользователь не найден', 400);
+      throw new ApiError({ message: 'Пользователь не найден' });
     }
     const comparePassword = compareSync(password, user.password);
     if (!comparePassword) {
-      throw new ApiError('Пароль не верный', 400);
+      throw new ApiError({ message: 'Пароль не верный' });
     }
     const payload = { id: user.id, login, role: user.role };
     const token = await reply.jwtSign(payload, { expiresIn: '7d' });
@@ -69,8 +69,7 @@ export default class UserController {
       const { id: userId, role } = req.user;
       const { id } = req.params;
       if (id !== userId && role !== 'admin') {
-        reply.code(403);
-        return;
+        throw new ApiError({ status: 403 });
       }
       const user = await User.findByPk(id, { rejectOnEmpty: true });
       await user.destroy();
@@ -78,7 +77,7 @@ export default class UserController {
       reply.code(204);
     } catch (error) {
       if (error instanceof ForeignKeyConstraintError) {
-        throw new ApiError('Невозможно удалить пользователя с художниками!', 400);
+        throw new ApiError({ message: 'Невозможно удалить пользователя с художниками!' });
       }
       throw error;
     }

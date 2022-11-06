@@ -15,7 +15,7 @@ export default class ArtistController {
 
       const artist = await Artist.findOne({ where: { name: { [Op.iLike]: req.body.name } } });
       if (artist) {
-        throw new ApiError('Художник с таким именем уже существует.', 400);
+        throw new ApiError({ message: 'Художник с таким именем уже существует.' });
       }
       const { id, name, img } = await Artist.create(
         { ...req.body, userId, img: imgName },
@@ -64,7 +64,7 @@ export default class ArtistController {
         where: { login: userLogin }, attributes: ['id'], transaction,
       });
       if (!user) {
-        throw new ApiError('Пользователь с таким логином не найден!', 400);
+        throw new ApiError({ message: 'Пользователь с таким логином не найден!' });
       }
       const { img: oldImgName } = artist;
       const newImgName = req.file ? `${v4()}.jpg` : oldImgName;

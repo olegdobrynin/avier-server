@@ -17,16 +17,16 @@ export default class ArtController {
       } = req.body;
       const filteredArtists = JSON.parse(artists).filter(({ artistId }) => artistId);
       if (filteredArtists.length < 1) {
-        throw new ApiError('Выберите артиста.', 400);
+        throw new ApiError({ message: 'Выберите артиста.' });
       }
       if (!typeId || typeId === 'undefined') {
-        throw new ApiError('Выберите тип.', 400);
+        throw new ApiError({ message: 'Выберите тип.' });
       }
       if (!name || name.length < 5) {
-        throw new ApiError('Введите название.', 400);
+        throw new ApiError({ message: 'Введите название.' });
       }
       if (!/^\d{0,4}$/.test(year) || (Number(year) > new Date().getFullYear())) {
-        throw new ApiError('Введите правильный год.', 400);
+        throw new ApiError({ message: 'Введите правильный год.' });
       }
       const mainImgName = req.files.length > 0 ? `${v4()}.jpg` : 'default.jpg';
 

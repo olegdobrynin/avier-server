@@ -5,7 +5,7 @@ export default (err, _, reply) => {
   const { status, message } = err;
   if (err instanceof ApiError) {
     reply.code(status);
-    return { message };
+    return message && { message };
   }
   if (err instanceof EmptyResultError) {
     reply.code(404);

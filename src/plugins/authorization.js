@@ -1,5 +1,6 @@
 import fp from 'fastify-plugin';
 import jwt from '@fastify/jwt';
+import ApiError from '../errors/ApiError.js';
 
 const leveling = [
   ['admin'],
@@ -7,11 +8,11 @@ const leveling = [
   ['admin', 'artist', 'user'],
 ];
 
-const authorization = (level) => async (req, reply) => {
+const authorization = (level) => async (req) => {
   const { role } = await req.jwtVerify();
 
   if (!leveling.at(level).includes(role)) {
-    reply.code(403);
+    throw new ApiError({ status: 403 });
   }
 };
 
